@@ -224,7 +224,7 @@ public class BoardController : MonoBehaviour
         switch (State)
         {
             case BoardState.ConfirmLoad:
-                ShowMessageBox("Do you really want to abort\nand reload board?", "yes", "no", BoardState.Load); 
+                ShowMessageBox("Do you really want to abort\nand reload board?", "Yes", "No", BoardState.Load); 
                 break;
             case BoardState.Load:
                 if (Reload())
@@ -240,7 +240,7 @@ public class BoardController : MonoBehaviour
                 }
                 break;
             case BoardState.PlayerGetReady:
-                ShowMessageBox($"Player {ActivePlayer.PlayerId} get ready!", "go", null, BoardState.RollDiceStart);
+                ShowMessageBox($"Player {ActivePlayer.PlayerId} get ready!", "Go", null, BoardState.RollDiceStart);
                 break;
             case BoardState.RollDiceStart:
                 TimeToRollDice1Sec = Random.Range(1f, 2f);
