@@ -99,7 +99,8 @@ public class BoardController : MonoBehaviour
     public int PointsForMovement;
     public int MovementCosts;
     public List<Vector3Int> MovementPath;
-    public Vector3Int[] MovementDirections = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
+    public Vector3Int[] MovementDirectionsOdd  = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
+    public Vector3Int[] MovementDirectionsEven = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(-1, 1, 0)/*top-left*/, new Vector3Int(0, 1, 0)/*top-right*/, new Vector3Int(-1, -1, 0)/*bottom-left*/, new Vector3Int(0, -1, 0)/*bottom-right*/ };
 
     private readonly Dictionary<Vector3Int, Tile> tilesLandscape = new();
     private readonly Dictionary<Vector3Int, Tile> tilesUnderTiles = new();
@@ -291,14 +292,14 @@ public class BoardController : MonoBehaviour
     {
         if (GeneratorMode == BoardMode.WholeBoard)
         {
-            var xMin = -BoardWidth/2;
-            var xMax = BoardWidth / 2;
+            var xMin = -BoardWidth  / 2;
+            var xMax = BoardWidth   / 2;
             var yMin = -BoardHeight / 2;
-            var yMax = BoardHeight / 2;
+            var yMax = BoardHeight  / 2;
             // add landscape tiles with its' under tiles
             for (var x = xMin; x <= xMax; x++)
             {
-                for (var y = yMin; y <= yMax; y++)
+                for (var y = yMax; y >= yMin; y--)
                 {
                     var landscapeTile = GetRandomLandscapeTile();
                     var position = new Vector3Int(x, y, 0);
@@ -365,14 +366,14 @@ public class BoardController : MonoBehaviour
         {
             if (tilesLandscape.Count > 0)
             {
-                var tileInfo = tilesLandscape.First();
+                var tileInfo = tilesLandscape.OrderByDescending(t => t.Key.y).OrderBy(t => t.Key.x).First();
                 tilesLandscape.Remove(tileInfo.Key);
                 TilemapLandscape.SetTile(tileInfo.Key, tileInfo.Value);
                 tileCreated = true;
             }
             if (tilesUnderTiles.Count > 0)
             {
-                var tileInfo = tilesUnderTiles.First();
+                var tileInfo = tilesUnderTiles.OrderByDescending(t => t.Key.y).OrderBy(t => t.Key.x).First();
                 tilesUnderTiles.Remove(tileInfo.Key);
                 TilemapUnderTiles.SetTile(tileInfo.Key, tileInfo.Value);
                 tileCreated = true;
@@ -486,13 +487,12 @@ public class BoardController : MonoBehaviour
     private Dictionary<Vector3Int, float> ConnectionsAndCosts(Vector3Int position)
     {
         var result = new Dictionary<Vector3Int, float>();
-        foreach (var dir in MovementDirections)
+        var directions = position.y % 2 == 0 ? MovementDirectionsEven : MovementDirectionsOdd;
+        foreach (var dir in directions)
         {
             var tile = GameTiles.Instance.Get<LandscapeTile>(position + dir);
             if (tile != null && tile.Movable)
-            {
                 result.Add(position + dir, tile.MovementCost);
-            }
         }
         return result;
     }

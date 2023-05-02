@@ -3,3 +3,4 @@
 - show selected playing piece info on select
 - show landscape info on hover
 - do playing piece action like move, fight, heal, ...
+- timer count down
