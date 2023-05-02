@@ -1,0 +1,5 @@
+- select playing piece type with combobox
+- show players info on round
+- show selected playing piece info on select
+- show landscape info on hover
+- do playing piece action like move, fight, heal, ...

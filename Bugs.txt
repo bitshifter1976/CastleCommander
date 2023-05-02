@@ -1,0 +1,2 @@
+- Reload board: normally creating board from left to right, but then its building up from right to left
+- pathfindig: sometimes jumps over 1 tile 
