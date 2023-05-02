@@ -58,6 +58,7 @@ public class BoardController : MonoBehaviour
     public Player Player2;
     [Header("Tilemaps")]
     public Tilemap TilemapPlayingPieces;
+    public Tilemap TilemapPath;
     public Tilemap TilemapLandscape;
     public Tilemap TilemapUnderTiles;
     [Header("Input")]
@@ -96,6 +97,7 @@ public class BoardController : MonoBehaviour
     public Tile Volcano;
     public Tile UnderDirt;
     public Tile UnderOcean;
+    public Tile Path;
     [Header("********** Info **********")]
     [Header("General")]
     public Player ActivePlayer;
@@ -188,6 +190,7 @@ public class BoardController : MonoBehaviour
         ActivePlayer = Player1;
         GameTiles.Instance.TileInfos = GetLandscapeTileInfos();
         GameTiles.Instance.TilesForMovement = GetLandscapeTilesForMovement();
+        pathfinder = new Pathfinder<Vector3Int>(DistanceFunc, ConnectionsAndCosts);
         ButtonReload.onClick.AddListener(OnReloadClick);
         MouseHandler.OnClick += OnBoardClick;
     }
@@ -209,6 +212,7 @@ public class BoardController : MonoBehaviour
         {
             Timer.StopTimer();
             TilemapPlayingPieces.ClearAllTiles();
+            TilemapPath.ClearAllTiles();
             TilemapLandscape.ClearAllTiles();
             TilemapUnderTiles.ClearAllTiles();
             ActivePlayer = Player1;
@@ -277,6 +281,9 @@ public class BoardController : MonoBehaviour
                 }
                 break;
             case BoardState.PlayRound:
+                // show path
+                ShowPath();
+                // round over?
                 if (Timer.IsOver() || PointsForMovement <= 0)
                     State = BoardState.FinishRound;
                 break;
@@ -287,6 +294,34 @@ public class BoardController : MonoBehaviour
                 break;
             case BoardState.GameEnd:
                 break;
+        }
+    }
+
+    private void ShowPath()
+    {
+        TilemapPath.ClearAllTiles();
+        if (formerSelectedPlayingPiece != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
+        {
+            pathfinder.GenerateAstarPath(formerSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition, out var path);
+            var costs = 0;
+            var movementPossible = true;
+            foreach (var position in path)
+            {
+                var tile = GameTiles.Instance.Get<LandscapeTile>(position);
+                costs += tile.MovementCost;
+                var pathTile = Path;
+                if (tile.Movable && costs <= PointsForMovement)
+                {
+                    pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, 100);
+                }
+                else
+                {
+                    movementPossible = false;
+                    pathTile.color = new Color(Color.red.r, Color.red.g, Color.red.b, 100);
+                }
+                TilemapPath.SetTile(position, pathTile);
+            }
+            MovementPath = movementPossible ? path : null;
         }
     }
 
@@ -399,7 +434,7 @@ public class BoardController : MonoBehaviour
         if (formerSelectedPlayingPiece == null && selectedPlayingPiece != null && selectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
             SelectPlayingPiece(selectedPlayingPiece);
         // if prior selected playing piece, move it
-        else if (formerSelectedPlayingPiece != null && selectedLandscapeTile != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && GetLandscapeTilesForMovement().Contains(selectedLandscapeTile.Tile))
+        else if (formerSelectedPlayingPiece != null && selectedLandscapeTile != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && GetLandscapeTilesForMovement().Contains(selectedLandscapeTile.Tile) && MovementPath != null)
             MovePlayingPiece(formerSelectedPlayingPiece);
         // if own castle clicked, spawn playing piece
         else if (selectedCastle != null && selectedCastle.Player.PlayerId == ActivePlayer.PlayerId)
@@ -445,8 +480,7 @@ public class BoardController : MonoBehaviour
     {
         var position = selectedPlayingPiece.BoardPosition;
         var target = MouseHandler.SelectedLandscapeTilePosition;
-        pathfinder = new Pathfinder<Vector3Int>(DistanceFunc, ConnectionsAndCosts);
-        pathfinder.GenerateAstarPath(position, target, out MovementPath);
+        //pathfinder.GenerateAstarPath(position, target, out MovementPath);
         if (MovementPath.Count > 0)
         {
             StopAllCoroutines();
