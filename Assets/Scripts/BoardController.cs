@@ -76,7 +76,13 @@ public class BoardController : MonoBehaviour
     public Animator Dice2Animation;
     public SpriteRenderer Dice1CurrentFrame;
     public SpriteRenderer Dice2CurrentFrame;
-
+    [Header("Timeouts")]
+    public readonly float TimeToAddTileSec = 0.01f;
+    public readonly float TimeToEndRoundSec = 30f;
+    public readonly float TimeToMovePlayingPieceSec = 0.1f;
+    [Header("Playing piece")]
+    public readonly float AlphaSelected = 1f;
+    public readonly float AlphaUnselected = 100f/256f;
     [Header("********** Tiles **********")]
     public Tile Base;
     public Tile Desert;
@@ -90,12 +96,16 @@ public class BoardController : MonoBehaviour
     public Tile Volcano;
     public Tile UnderDirt;
     public Tile UnderOcean;
-
     [Header("********** Info **********")]
+    [Header("General")]
     public Player ActivePlayer;
     public BoardState State = BoardState.Load;
+    [Header("Dice")]
+    public float TimeToRollDice1Sec = 0f;
+    public float TimeToRollDice2Sec = 0f;
     public int Dice1Result;
     public int Dice2Result;
+    [Header("Playing piece movement")]
     public int PointsForMovement;
     public int MovementCosts;
     public List<Vector3Int> MovementPath;
@@ -104,23 +114,15 @@ public class BoardController : MonoBehaviour
 
     private readonly Dictionary<Vector3Int, Tile> tilesLandscape = new();
     private readonly Dictionary<Vector3Int, Tile> tilesUnderTiles = new();
-    private readonly float TimeToAddTileSec = 0.01f;
-    private readonly float TimeToEndRoundSec = 30f;
-    private readonly float TimeToMovePlayingPieceSec = 1f;
-    private readonly float AlphaSelected = 1f;
-    private readonly float AlphaUnselected = 100f/256f;
-    private float TimeToRollDice1Sec = 0f;
-    private float TimeToRollDice2Sec = 0f;
     private float timeElapsed = 0f;
     private LandscapeTile selectedLandscapeTile;
     private CastleTile selectedCastle;
     private PlayingPieceTile selectedPlayingPiece;
     private PlayingPieceTile formerSelectedPlayingPiece;
     private Pathfinder<Vector3Int> pathfinder;
-
     #endregion
 
-    private List<TileInfo> GetLandscapeTileInfos()
+    public List<TileInfo> GetLandscapeTileInfos()
     {
         return new List<TileInfo>
         {
@@ -225,7 +227,7 @@ public class BoardController : MonoBehaviour
         switch (State)
         {
             case BoardState.ConfirmLoad:
-                ShowMessageBox("Do you really want to abort\nand reload board?", "Yes", "No", BoardState.Load); 
+                ShowMessageBox("Do you really want to abort\nand reload the board?", "Yes", "No", BoardState.Load); 
                 break;
             case BoardState.Load:
                 if (Reload())
@@ -270,12 +272,12 @@ public class BoardController : MonoBehaviour
                 {
                     timeElapsed = 0;
                     PointsForMovement = Dice1Result*10 + Dice2Result*10;
-                    Timer.StartTimer();
+                    Timer.StartTimer(TimeToEndRoundSec);
                     State = BoardState.PlayRound;
                 }
                 break;
             case BoardState.PlayRound:
-                if (Timer.TimeElapsedSec >= TimeToEndRoundSec || PointsForMovement <= 0)
+                if (Timer.IsOver() || PointsForMovement <= 0)
                     State = BoardState.FinishRound;
                 break;
             case BoardState.FinishRound:

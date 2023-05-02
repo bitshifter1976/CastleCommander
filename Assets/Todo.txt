@@ -1,6 +1,7 @@
 - select playing piece type with combobox
 - show players info on round
 - show selected playing piece info on select
-- show landscape info on hover
+- show landscape info on select
 - do playing piece action like move, fight, heal, ...
-- timer count down
+- show path, red if not reachable, green if reachable
+- when a landscape tile is selected show path, if selected twice move 

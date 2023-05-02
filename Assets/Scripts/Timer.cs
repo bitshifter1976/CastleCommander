@@ -6,9 +6,8 @@ public class Timer : MonoBehaviour
 {
     private TextMeshProUGUI text;
     private bool isRunning = false;
-    private float timeout;
-
-    public double TimeElapsedSec = 0f;
+    private double timeElapsedSec = 0f;
+    private double timeToEndRoundSec;
 
     // Start is called before the first frame update
     private void Start()
@@ -21,20 +20,26 @@ public class Timer : MonoBehaviour
     {
         if (isRunning)
         {
-            TimeElapsedSec += Time.deltaTime;
-            var time = TimeSpan.FromSeconds(TimeElapsedSec);
+            timeElapsedSec += Time.deltaTime;
+            var time = TimeSpan.FromSeconds(timeToEndRoundSec - timeElapsedSec);
             text.text = string.Format("{0:D2}:{1:D2}", time.Minutes, time.Seconds);
         }
     }
 
-    public void StartTimer()
+    public void StartTimer(float timeoutSec)
     {
-        TimeElapsedSec = 0;
+        timeElapsedSec = 0;
+        timeToEndRoundSec = timeoutSec;
         isRunning = true;
     }
 
     public void StopTimer()
     {
         isRunning = false;
+    }
+
+    public bool IsOver()
+    {
+        return timeElapsedSec >= timeToEndRoundSec;
     }
 }
