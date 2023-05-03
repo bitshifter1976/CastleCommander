@@ -15,8 +15,6 @@ public class GameTiles : MonoBehaviour
     public int LastId = 0;
     public List<TileInfo> TileInfos;
     public List<Tile> TilesForMovement;
-    private Color ColorPlayer1 = Color.yellow;
-    private Color ColorPlayer2 = Color.magenta;
 
     private void Awake()
     {
@@ -66,11 +64,10 @@ public class GameTiles : MonoBehaviour
                     LandscapeTiles.Add(boardPosition, new LandscapeTile(boardPosition, tile, tilemap, NewId(), tile.color, landscapeType, TilesForMovement.Contains(tile), TileInfos.First(t => t.Tile == tile).MovementCosts));
                 return LandscapeTiles[boardPosition];
             case GameTile.TileType.PlayingPiece:
-                var color2 = player.PlayerId == 1 ? ColorPlayer1 : ColorPlayer2;
                 if (PlayingPieceTiles.ContainsKey(boardPosition))
-                    PlayingPieceTiles[boardPosition] = new PlayingPieceTile(boardPosition, tile, tilemap, PlayingPieceTiles[boardPosition].Id, color2, playingPieceType, player, false, 0);
+                    PlayingPieceTiles[boardPosition] = new PlayingPieceTile(boardPosition, tile, tilemap, PlayingPieceTiles[boardPosition].Id, player.Color, playingPieceType, player, false, 0);
                 else
-                    PlayingPieceTiles.Add(boardPosition, new PlayingPieceTile(boardPosition, tile, tilemap, NewId(), color2, playingPieceType, player, false, 0));
+                    PlayingPieceTiles.Add(boardPosition, new PlayingPieceTile(boardPosition, tile, tilemap, NewId(), player.Color, playingPieceType, player, false, 0));
                 return PlayingPieceTiles[boardPosition];
             default: 
                 return null;

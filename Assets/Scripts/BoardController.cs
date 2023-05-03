@@ -78,8 +78,12 @@ public class BoardController : MonoBehaviour
     [Header("Dice")]
     public Animator Dice1Animation;
     public Animator Dice2Animation;
+    public Animator Dice3Animation;
+    public Animator Dice4Animation;
     public SpriteRenderer Dice1CurrentFrame;
     public SpriteRenderer Dice2CurrentFrame;
+    public SpriteRenderer Dice3CurrentFrame;
+    public SpriteRenderer Dice4CurrentFrame;
     [Header("Timeouts")]
     public readonly float TimeToAddTileSec = 0.01f;
     public readonly float TimeToEndRoundSec = 30f;
@@ -111,6 +115,8 @@ public class BoardController : MonoBehaviour
     public float TimeToRollDice2Sec = 0f;
     public int Dice1Result;
     public int Dice2Result;
+    public int Dice3Result;
+    public int Dice4Result;
     [Header("Playing piece movement")]
     public int PointsForMovement;
     public int MovementCosts;
@@ -191,6 +197,12 @@ public class BoardController : MonoBehaviour
         MessageBox.SetActive(false);
         Dice1Animation.enabled = false;
         Dice2Animation.enabled = false;
+        Dice3Animation.enabled = false;
+        Dice4Animation.enabled = false;
+        Dice1CurrentFrame.color = Player1.Color;
+        Dice2CurrentFrame.color = Player1.Color;
+        Dice3CurrentFrame.color = Player2.Color;
+        Dice4CurrentFrame.color = Player2.Color;
         ActivePlayer = Player1;
         GameTiles.Instance.TileInfos = GetLandscapeTileInfos();
         GameTiles.Instance.TilesForMovement = GetLandscapeTilesForMovement();
@@ -209,7 +221,7 @@ public class BoardController : MonoBehaviour
         ActivePlayer = ActivePlayer == Player1 ? Player2 : Player1;
     }
 
-    public bool Reload()
+    public bool LoadBoard()
     {
         var result = false;
         try
@@ -235,10 +247,10 @@ public class BoardController : MonoBehaviour
         switch (State)
         {
             case BoardState.ConfirmLoad:
-                ShowMessageBox("Do you really want to abort\nand reload the board?", "Yes", "No", BoardState.Load); 
+                ShowMessageBox("do you want to abort the game\nand load a new board?", "yes", "no", BoardState.Load); 
                 break;
             case BoardState.Load:
-                if (Reload())
+                if (LoadBoard())
                     State = BoardState.CreateBoard;
                 break;
             case BoardState.CreateBoard:
@@ -251,41 +263,28 @@ public class BoardController : MonoBehaviour
                 }
                 break;
             case BoardState.PlayerGetReady:
-                ShowMessageBox($"Player {ActivePlayer.PlayerId} get ready!", "Go", null, BoardState.RollDiceStart);
+                ShowMessageBox($"player {ActivePlayer.PlayerId} get ready!", "go", null, BoardState.RollDiceStart);
                 break;
             case BoardState.RollDiceStart:
-                TimeToRollDice1Sec = Random.Range(1f, 2f);
-                TimeToRollDice2Sec = Random.Range(1f, 2f);
-                Dice1Animation.enabled = true;
-                Dice2Animation.enabled = true;
+                PrepareDiceRoll();
                 State = BoardState.RollDice;
                 break;
             case BoardState.RollDice:
                 timeElapsed += Time.deltaTime;
-                var dice1RollingFinished = false;
-                var dice2RollingFinished = false;
-                if (timeElapsed >= TimeToRollDice1Sec)
-                {
-                    Dice1Animation.enabled = false;
-                    Dice1Result = int.Parse(Dice1CurrentFrame.sprite.name.Substring("Dice".Length));
-                    dice1RollingFinished = true;
-                }
-                if (timeElapsed >= TimeToRollDice2Sec)
-                {
-                    Dice2Animation.enabled = false;
-                    Dice2Result = int.Parse(Dice2CurrentFrame.sprite.name.Substring("Dice".Length));
-                    dice2RollingFinished = true;
-                }
+                var dice1RollingFinished = RollDice1();
+                var dice2RollingFinished = RollDice2();
                 if (dice1RollingFinished && dice2RollingFinished)
                 {
                     timeElapsed = 0;
-                    PointsForMovement = Dice1Result*10 + Dice2Result*10;
+                    if (ActivePlayer.PlayerId == Player1.PlayerId)
+                        PointsForMovement = Dice1Result * 10 + Dice2Result * 10;
+                    else 
+                        PointsForMovement = Dice3Result * 10 + Dice4Result * 10;
                     Timer.StartTimer(TimeToEndRoundSec);
                     State = BoardState.PlayRound;
                 }
                 break;
             case BoardState.PlayRound:
-                // show path
                 ShowPath();
                 // round over?
                 if (Timer.IsOver() || PointsForMovement <= 0)
@@ -298,6 +297,60 @@ public class BoardController : MonoBehaviour
                 break;
             case BoardState.GameEnd:
                 break;
+        }
+    }
+
+    private bool RollDice1()
+    {
+        if (timeElapsed >= TimeToRollDice1Sec)
+        {
+            if (ActivePlayer.PlayerId == Player1.PlayerId)
+            {
+                Dice1Animation.enabled = false;
+                Dice1Result = int.Parse(Dice1CurrentFrame.sprite.name.Substring("Dice".Length));
+            }
+            else
+            {
+                Dice3Animation.enabled = false;
+                Dice3Result = int.Parse(Dice3CurrentFrame.sprite.name.Substring("Dice".Length));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private bool RollDice2()
+    {
+        if (timeElapsed >= TimeToRollDice2Sec)
+        {
+            if (ActivePlayer.PlayerId == Player1.PlayerId)
+            {
+                Dice2Animation.enabled = false;
+                Dice2Result = int.Parse(Dice2CurrentFrame.sprite.name.Substring("Dice".Length));
+            }
+            else
+            {
+                Dice4Animation.enabled = false;
+                Dice4Result = int.Parse(Dice4CurrentFrame.sprite.name.Substring("Dice".Length));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void PrepareDiceRoll()
+    {
+        TimeToRollDice1Sec = Random.Range(1f, 2f);
+        TimeToRollDice2Sec = Random.Range(1f, 2f);
+        if (ActivePlayer.PlayerId == Player1.PlayerId)
+        {
+            Dice1Animation.enabled = true;
+            Dice2Animation.enabled = true;
+        }
+        else
+        {
+            Dice3Animation.enabled = true;
+            Dice4Animation.enabled = true;
         }
     }
 
@@ -316,12 +369,12 @@ public class BoardController : MonoBehaviour
                 var pathTile = Path;
                 if (tile.Movable && costs <= PointsForMovement)
                 {
-                    pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, 100);
+                    pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, AlphaUnselected);
                 }
                 else
                 {
                     movementPossible = false;
-                    pathTile.color = new Color(Color.red.r, Color.red.g, Color.red.b, 100);
+                    pathTile.color = new Color(Color.red.r, Color.red.g, Color.red.b, AlphaUnselected);
                 }
                 TilemapPath.SetTile(position, pathTile);
             }
@@ -433,12 +486,13 @@ public class BoardController : MonoBehaviour
         selectedLandscapeTile = GameTiles.Instance.Get<LandscapeTile>(MouseHandler.SelectedLandscapeTilePosition);
         selectedCastle = GameTiles.Instance.Get<CastleTile>(MouseHandler.SelectedLandscapeTilePosition);
         selectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.SelectedPlayingPiecePosition);
+        var tileToMoveToHasPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.SelectedLandscapeTilePosition) != null;
 
         // if not prior selected playing piece, select it for movement
         if (formerSelectedPlayingPiece == null && selectedPlayingPiece != null && selectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
             SelectPlayingPiece(selectedPlayingPiece);
         // if prior selected playing piece, move it
-        else if (formerSelectedPlayingPiece != null && selectedLandscapeTile != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && GetLandscapeTilesForMovement().Contains(selectedLandscapeTile.Tile) && MovementPath != null)
+        else if (formerSelectedPlayingPiece != null && selectedLandscapeTile != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && GetLandscapeTilesForMovement().Contains(selectedLandscapeTile.Tile) && MovementPath != null && !tileToMoveToHasPlayingPiece)
             MovePlayingPiece(formerSelectedPlayingPiece);
         // if own castle clicked, spawn playing piece
         else if (selectedCastle != null && selectedCastle.Player.PlayerId == ActivePlayer.PlayerId)
