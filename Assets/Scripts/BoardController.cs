@@ -448,19 +448,32 @@ public class BoardController : MonoBehaviour
 
     private void PlacePlayingPiece(Vector3Int position)
     {
-        var tile = ActivePlayer.PlayingPiece;
-        if (tile != null)
+        var selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
+        selectUnitTypeBox.transform.SetParent(Hud.transform, false);
+        var selectDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
+        selectDropdown.onValueChanged.AddListener((choice) =>
         {
-            var selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
-            selectUnitTypeBox.transform.SetParent(Hud.transform, false);
-            var selectDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
-            selectDropdown.onValueChanged.AddListener((choice) =>
+            var playingPieceType = (PlayingPieceTile.PlayingPieceTileType)choice;
+            Tile tile = null;
+            switch (playingPieceType)
             {
-                var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, TilemapPlayingPieces, ActivePlayer, (PlayingPieceTile.PlayingPieceTileType)choice);
+                case PlayingPieceTile.PlayingPieceTileType.Infantry:
+                    tile = ActivePlayer.InfantryTile;
+                    break;
+                case PlayingPieceTile.PlayingPieceTileType.Artillery:
+                    tile = ActivePlayer.ArtilleryTile;
+                    break;
+                case PlayingPieceTile.PlayingPieceTileType.Medic:
+                    tile = ActivePlayer.MedicTile;
+                    break;
+            }
+            if (tile != null)
+            {
+                var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, TilemapPlayingPieces, ActivePlayer, playingPieceType);
                 SelectPlayingPiece(tileInfo as PlayingPieceTile);
-                Destroy(selectUnitTypeBox);
-            });
-        }
+            }
+            Destroy(selectUnitTypeBox);
+        });
     }
 
     private void SelectPlayingPiece(PlayingPieceTile playingPiece)
@@ -472,7 +485,7 @@ public class BoardController : MonoBehaviour
         TilemapPlayingPieces.SetTile(playingPiece.BoardPosition, playingPiece.Tile);
         formerSelectedPlayingPiece = playingPiece;
         MouseHandler.SelectedPlayingPiecePosition = playingPiece.BoardPosition;
-        MouseHandler.SelectedPlayingPiece = ActivePlayer.PlayingPiece;
+        MouseHandler.SelectedPlayingPiece = playingPiece.Tile;
     }
 
     private void DeselectPlayingPiece(PlayingPieceTile playingPiece)

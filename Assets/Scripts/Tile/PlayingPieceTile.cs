@@ -6,10 +6,10 @@ public class PlayingPieceTile : GameTile
 {
     public enum PlayingPieceTileType
     {
-        None,
-        Infantry,
-        Artillery,
-        Medic
+        None = -1,
+        Infantry = 0,
+        Artillery = 1,
+        Medic = 2
     }
 
     public PlayingPieceTileType PlayingPieceType;

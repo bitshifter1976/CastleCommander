@@ -1,4 +1,3 @@
-- use different playing piece tiles for different unit types
 - show players info on round
 - show selected playing piece info on select
 - show landscape info on select
