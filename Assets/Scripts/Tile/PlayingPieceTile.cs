@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -17,7 +16,7 @@ public class PlayingPieceTile : GameTile
 
     public Player Player;
 
-    public PlayingPieceTile(Vector3Int boardPosition, Tile tile, Tilemap tilemap, int id, PlayingPieceTileType type, Player player, bool movable, int movementCost) : base(boardPosition, tile, tilemap, id, TileType.PlayingPiece, movable, movementCost)
+    public PlayingPieceTile(Vector3Int boardPosition, Tile tile, Tilemap tilemap, int id, Color color, PlayingPieceTileType type, Player player, bool movable, int movementCost) : base(boardPosition, tile, tilemap, id, color, TileType.PlayingPiece, movable, movementCost)
     {
         PlayingPieceType = type;
         Player = player;

@@ -1,7 +1,5 @@
-- select playing piece type with combobox
+- use different playing piece tiles for different unit types
 - show players info on round
 - show selected playing piece info on select
 - show landscape info on select
 - do playing piece action like move, fight, heal, ...
-- show path, red if not reachable, green if reachable
-- when a landscape tile is selected show path, if selected twice move 

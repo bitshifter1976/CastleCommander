@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using TMPro;
 using Aoiti.Pathfinding;
 using System.IO;
+using Unity.VisualScripting;
 
 public class BoardController : MonoBehaviour
 {
@@ -64,6 +65,7 @@ public class BoardController : MonoBehaviour
     [Header("Input")]
     public MouseHandler MouseHandler;
     [Header("Hud")]
+    public GameObject Hud;
     public Button ButtonReload;
     public Timer Timer;
     public GameObject MessageBox;
@@ -72,6 +74,7 @@ public class BoardController : MonoBehaviour
     public TextMeshProUGUI MessageBoxText;
     public TextMeshProUGUI MessageBoxButtonOkText;
     public TextMeshProUGUI MessageBoxButtonCancelText;
+    public GameObject SelectUnitTypePrefab;
     [Header("Dice")]
     public Animator Dice1Animation;
     public Animator Dice2Animation;
@@ -93,7 +96,8 @@ public class BoardController : MonoBehaviour
     public Tile Mountain;
     public Tile Ocean;
     public Tile Grass;
-    public Tile Castle;
+    public Tile Castle1;
+    public Tile Castle2;
     public Tile Volcano;
     public Tile UnderDirt;
     public Tile UnderOcean;
@@ -342,7 +346,7 @@ public class BoardController : MonoBehaviour
                     var position = new Vector3Int(x, y, 0);
                     tilesLandscape.Add(position, landscapeTile);
                     tilesUnderTiles.Add(position, landscapeTile == Ocean ? UnderOcean : UnderDirt);
-                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, landscapeTile, TilemapLandscape, null, PlayingPieceTile.PlayingPieceTileType.None, GetLandscapeType(landscapeTile));
+                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, landscapeTile, TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GetLandscapeType(landscapeTile));
                 }
             }
             // add player castle tiles
@@ -352,12 +356,12 @@ public class BoardController : MonoBehaviour
             var y2 = Random.Range(yMin, yMax);
             var pos1 = new Vector3Int(x1, y1, 0);
             var pos2 = new Vector3Int(x2, y2, 0);
-            tilesLandscape[pos1] = Castle;
+            tilesLandscape[pos1] = Castle1;
             tilesUnderTiles[pos1] = UnderDirt;
-            tilesLandscape[pos2] = Castle;
+            tilesLandscape[pos2] = Castle2;
             tilesUnderTiles[pos2] = UnderDirt;
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, Castle, TilemapLandscape, Player1);
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, Castle, TilemapLandscape, Player2);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, Castle1, TilemapLandscape, Player1);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, Castle2, TilemapLandscape, Player2);
         }
     }
 
@@ -447,8 +451,15 @@ public class BoardController : MonoBehaviour
         var tile = ActivePlayer.PlayingPiece;
         if (tile != null)
         {
-            var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, TilemapPlayingPieces, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.Infantry);
-            SelectPlayingPiece(tileInfo as PlayingPieceTile);
+            var selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
+            selectUnitTypeBox.transform.SetParent(Hud.transform, false);
+            var selectDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
+            selectDropdown.onValueChanged.AddListener((choice) =>
+            {
+                var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, TilemapPlayingPieces, ActivePlayer, (PlayingPieceTile.PlayingPieceTileType)choice);
+                SelectPlayingPiece(tileInfo as PlayingPieceTile);
+                Destroy(selectUnitTypeBox);
+            });
         }
     }
 

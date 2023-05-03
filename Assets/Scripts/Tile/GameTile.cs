@@ -26,10 +26,11 @@ public class GameTile
 
     public int MovementCost;
 
-    public GameTile(Vector3Int boardPosition, Tile tile, Tilemap tilemap, int id, TileType type, bool movable, int movementCost)
+    public GameTile(Vector3Int boardPosition, Tile tile, Tilemap tilemap, int id, Color color, TileType type, bool movable, int movementCost)
     {
         BoardPosition = boardPosition;
         Tile = tile;
+        Tile.color = color;
         Tilemap = tilemap;
         Id = id;
         Type = type;

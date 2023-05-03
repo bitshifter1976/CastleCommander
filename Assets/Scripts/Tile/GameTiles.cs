@@ -15,6 +15,8 @@ public class GameTiles : MonoBehaviour
     public int LastId = 0;
     public List<TileInfo> TileInfos;
     public List<Tile> TilesForMovement;
+    private Color ColorPlayer1 = Color.yellow;
+    private Color ColorPlayer2 = Color.magenta;
 
     private void Awake()
     {
@@ -33,7 +35,7 @@ public class GameTiles : MonoBehaviour
         if (tile != null && PlayingPieceTiles.ContainsKey(tile.BoardPosition))
         {
             PlayingPieceTiles.Remove(tile.BoardPosition);
-            var newTile = new PlayingPieceTile(newPosition, tile.Tile, tile.Tilemap, tile.Id, tile.PlayingPieceType, tile.Player, false, 0);
+            var newTile = new PlayingPieceTile(newPosition, tile.Tile, tile.Tilemap, tile.Id, tile.Tile.color, tile.PlayingPieceType, tile.Player, false, 0);
             PlayingPieceTiles.TryAdd(newPosition, newTile);
             return newTile;
         }
@@ -44,8 +46,8 @@ public class GameTiles : MonoBehaviour
         GameTile.TileType type, 
         Vector3Int boardPosition, 
         Tile tile, 
-        Tilemap tilemap, 
-        Player player = null, 
+        Tilemap tilemap,
+        Player player, 
         PlayingPieceTile.PlayingPieceTileType playingPieceType = PlayingPieceTile.PlayingPieceTileType.None, 
         LandscapeTile.LandscapeTileType landscapeType = LandscapeTile.LandscapeTileType.None)
     {
@@ -53,21 +55,22 @@ public class GameTiles : MonoBehaviour
         {
             case GameTile.TileType.Castle:
                 if (CastleTiles.ContainsKey(boardPosition))
-                    CastleTiles[boardPosition] = new CastleTile(boardPosition, tile, tilemap, CastleTiles[boardPosition].Id, player, true, 1);
+                    CastleTiles[boardPosition] = new CastleTile(boardPosition, tile, tilemap, CastleTiles[boardPosition].Id, tile.color, player, true, 1);
                 else
-                    CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tilemap, NewId(), player, true, 1));
+                    CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tilemap, NewId(), tile.color, player, true, 1));
                 return CastleTiles[boardPosition];
             case GameTile.TileType.Landscape:
                 if (LandscapeTiles.ContainsKey(boardPosition))
-                    LandscapeTiles[boardPosition] = new LandscapeTile(boardPosition, tile, tilemap, LandscapeTiles[boardPosition].Id, landscapeType, TilesForMovement.Contains(tile), TileInfos.First(t => t.Tile == tile).MovementCosts);
+                    LandscapeTiles[boardPosition] = new LandscapeTile(boardPosition, tile, tilemap, LandscapeTiles[boardPosition].Id, tile.color, landscapeType, TilesForMovement.Contains(tile), TileInfos.First(t => t.Tile == tile).MovementCosts);
                 else
-                    LandscapeTiles.Add(boardPosition, new LandscapeTile(boardPosition, tile, tilemap, NewId(), landscapeType, TilesForMovement.Contains(tile), TileInfos.First(t => t.Tile == tile).MovementCosts));
+                    LandscapeTiles.Add(boardPosition, new LandscapeTile(boardPosition, tile, tilemap, NewId(), tile.color, landscapeType, TilesForMovement.Contains(tile), TileInfos.First(t => t.Tile == tile).MovementCosts));
                 return LandscapeTiles[boardPosition];
             case GameTile.TileType.PlayingPiece:
+                var color2 = player.PlayerId == 1 ? ColorPlayer1 : ColorPlayer2;
                 if (PlayingPieceTiles.ContainsKey(boardPosition))
-                    PlayingPieceTiles[boardPosition] = new PlayingPieceTile(boardPosition, tile, tilemap, PlayingPieceTiles[boardPosition].Id, playingPieceType, player, false, 0);
+                    PlayingPieceTiles[boardPosition] = new PlayingPieceTile(boardPosition, tile, tilemap, PlayingPieceTiles[boardPosition].Id, color2, playingPieceType, player, false, 0);
                 else
-                    PlayingPieceTiles.Add(boardPosition, new PlayingPieceTile(boardPosition, tile, tilemap, NewId(), playingPieceType, player, false, 0));
+                    PlayingPieceTiles.Add(boardPosition, new PlayingPieceTile(boardPosition, tile, tilemap, NewId(), color2, playingPieceType, player, false, 0));
                 return PlayingPieceTiles[boardPosition];
             default: 
                 return null;
