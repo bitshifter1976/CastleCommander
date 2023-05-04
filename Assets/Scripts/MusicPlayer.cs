@@ -5,35 +5,37 @@ public class MusicPlayer : MonoBehaviour
 {
     public AudioClip[] Music;
     public Slider SliderVolume;
-    private AudioSource audio;
+    public float InitialVolume = 0.5f;
+    private AudioSource Audio;
 
     private void Start()
     {
-        audio = GetComponent<AudioSource>();
-        audio.volume = SliderVolume.value;
+        Audio = GetComponent<AudioSource>();
+        SliderVolume.value = InitialVolume;
+        Audio.volume = InitialVolume;
         SliderVolume.onValueChanged.AddListener(OnVolumeChanged);
         PlayRandomMusic();
     }
 
     private void OnVolumeChanged(float volume)
     {
-        audio.volume = volume;
+        Audio.volume = volume;
     }
 
     private void Update()
     {
-        if (!audio.isPlaying)
+        if (!Audio.isPlaying)
             PlayRandomMusic();
     }
 
     private void PlayRandomMusic()
     {
-        audio.clip = Music[Random.Range(0, Music.Length)];
-        audio.Play();
+        Audio.clip = Music[Random.Range(0, Music.Length)];
+        Audio.Play();
     }
 
     public void OnMusicVolumeChanged(float volume)
     {
-        audio.volume = volume;
+        Audio.volume = volume;
     }
 }

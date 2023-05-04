@@ -67,6 +67,7 @@ public class BoardController : MonoBehaviour
     [Header("Hud")]
     public GameObject Hud;
     public Button ButtonReload;
+    public Button ButtonEndTurn;
     public Timer Timer;
     public GameObject MessageBox;
     public Button MessageBoxButtonOk;
@@ -85,12 +86,12 @@ public class BoardController : MonoBehaviour
     public SpriteRenderer Dice3CurrentFrame;
     public SpriteRenderer Dice4CurrentFrame;
     [Header("Timeouts")]
-    public readonly float TimeToAddTileSec = 0.01f;
-    public readonly float TimeToEndRoundSec = 30f;
-    public readonly float TimeToMovePlayingPieceSec = 0.1f;
+    public float TimeToAddTileSec = 0.01f;
+    public float TimeToEndRoundSec = 30f;
+    public float TimeToMovePlayingPieceSec = 0.1f;
     [Header("Playing piece")]
-    public readonly float AlphaSelected = 1f;
-    public readonly float AlphaUnselected = 100f/256f;
+    public float AlphaSelected = 1f;
+    public float AlphaUnselected = 100f/256f;
     [Header("********** Tiles **********")]
     public Tile Base;
     public Tile Desert;
@@ -132,6 +133,8 @@ public class BoardController : MonoBehaviour
     private PlayingPieceTile selectedPlayingPiece;
     private PlayingPieceTile formerSelectedPlayingPiece;
     private Pathfinder<Vector3Int> pathfinder;
+    private GameObject selectUnitTypeBox;
+    private TMP_Dropdown selectUnitTypeDropdown;
     #endregion
 
     public List<TileInfo> GetLandscapeTileInfos()
@@ -208,7 +211,14 @@ public class BoardController : MonoBehaviour
         GameTiles.Instance.TilesForMovement = GetLandscapeTilesForMovement();
         pathfinder = new Pathfinder<Vector3Int>(DistanceFunc, ConnectionsAndCosts);
         ButtonReload.onClick.AddListener(OnReloadClick);
+        ButtonEndTurn.onClick.AddListener(OnEndTurn);
         MouseHandler.OnClick += OnBoardClick;
+    }
+
+    private void OnEndTurn()
+    {
+        if (State == BoardState.PlayRound)
+            State = BoardState.FinishRound;
     }
 
     private void OnReloadClick()
@@ -291,6 +301,11 @@ public class BoardController : MonoBehaviour
                     State = BoardState.FinishRound;
                 break;
             case BoardState.FinishRound:
+                if (selectUnitTypeBox != null)
+                    Destroy(selectUnitTypeBox);
+                if (formerSelectedPlayingPiece != null)
+                    DeselectPlayingPiece(formerSelectedPlayingPiece);
+                TilemapPath.ClearAllTiles();
                 Timer.StopTimer();
                 SwitchPlayer();
                 State = BoardState.PlayerGetReady;
@@ -365,9 +380,10 @@ public class BoardController : MonoBehaviour
             foreach (var position in path)
             {
                 var tile = GameTiles.Instance.Get<LandscapeTile>(position);
+                var playingPiece = GameTiles.Instance.Get<PlayingPieceTile>(position);
                 costs += tile.MovementCost;
                 var pathTile = Path;
-                if (tile.Movable && costs <= PointsForMovement)
+                if (tile.Movable && costs <= PointsForMovement && playingPiece == null && movementPossible)
                 {
                     pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, AlphaUnselected);
                 }
@@ -502,10 +518,13 @@ public class BoardController : MonoBehaviour
 
     private void PlacePlayingPiece(Vector3Int position)
     {
-        var selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
+        if (selectUnitTypeBox != null)
+            return;
+        
+        selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
         selectUnitTypeBox.transform.SetParent(Hud.transform, false);
-        var selectDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
-        selectDropdown.onValueChanged.AddListener((choice) =>
+        selectUnitTypeDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
+        selectUnitTypeDropdown.onValueChanged.AddListener((choice) =>
         {
             var playingPieceType = (PlayingPieceTile.PlayingPieceTileType)choice;
             Tile tile = null;
