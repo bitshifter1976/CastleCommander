@@ -33,7 +33,7 @@ public class GameTiles : MonoBehaviour
         if (tile != null && PlayingPieceTiles.ContainsKey(tile.BoardPosition))
         {
             PlayingPieceTiles.Remove(tile.BoardPosition);
-            var newTile = new PlayingPieceTile(newPosition, tile.Tile, tile.Tilemap, tile.Id, tile.Tile.color, tile.PlayingPieceType, tile.Player, false, 0);
+            var newTile = new PlayingPieceTile(newPosition, tile.Tile, tile.Tilemap, tile.Id, tile.Tile.color, tile.PlayingPieceType, tile.Player, false, tile.MovementCost);
             PlayingPieceTiles.TryAdd(newPosition, newTile);
             return newTile;
         }
@@ -43,7 +43,7 @@ public class GameTiles : MonoBehaviour
     public GameTile Add(
         GameTile.TileType type, 
         Vector3Int boardPosition, 
-        Tile tile, 
+        TileInfo tile, 
         Tilemap tilemap,
         Player player, 
         PlayingPieceTile.PlayingPieceTileType playingPieceType = PlayingPieceTile.PlayingPieceTileType.None, 
@@ -53,21 +53,21 @@ public class GameTiles : MonoBehaviour
         {
             case GameTile.TileType.Castle:
                 if (CastleTiles.ContainsKey(boardPosition))
-                    CastleTiles[boardPosition] = new CastleTile(boardPosition, tile, tilemap, CastleTiles[boardPosition].Id, tile.color, player, true, 1);
+                    CastleTiles[boardPosition] = new CastleTile(boardPosition, tile.Tile, tilemap, CastleTiles[boardPosition].Id, tile.Tile.color, player, true, tile.MovementCosts);
                 else
-                    CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tilemap, NewId(), tile.color, player, true, 1));
+                    CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile.Tile, tilemap, NewId(), tile.Tile.color, player, true, tile.MovementCosts));
                 return CastleTiles[boardPosition];
             case GameTile.TileType.Landscape:
                 if (LandscapeTiles.ContainsKey(boardPosition))
-                    LandscapeTiles[boardPosition] = new LandscapeTile(boardPosition, tile, tilemap, LandscapeTiles[boardPosition].Id, tile.color, landscapeType, TilesForMovement.Contains(tile), TileInfos.First(t => t.Tile == tile).MovementCosts);
+                    LandscapeTiles[boardPosition] = new LandscapeTile(boardPosition, tile.Tile, tilemap, LandscapeTiles[boardPosition].Id, tile.Tile.color, landscapeType, TilesForMovement.Contains(tile.Tile), tile.MovementCosts);
                 else
-                    LandscapeTiles.Add(boardPosition, new LandscapeTile(boardPosition, tile, tilemap, NewId(), tile.color, landscapeType, TilesForMovement.Contains(tile), TileInfos.First(t => t.Tile == tile).MovementCosts));
+                    LandscapeTiles.Add(boardPosition, new LandscapeTile(boardPosition, tile.Tile, tilemap, NewId(), tile.Tile.color, landscapeType, TilesForMovement.Contains(tile.Tile), tile.MovementCosts));
                 return LandscapeTiles[boardPosition];
             case GameTile.TileType.PlayingPiece:
                 if (PlayingPieceTiles.ContainsKey(boardPosition))
-                    PlayingPieceTiles[boardPosition] = new PlayingPieceTile(boardPosition, tile, tilemap, PlayingPieceTiles[boardPosition].Id, player.Color, playingPieceType, player, false, 0);
+                    PlayingPieceTiles[boardPosition] = new PlayingPieceTile(boardPosition, tile.Tile, tilemap, PlayingPieceTiles[boardPosition].Id, player.Color, playingPieceType, player, false, 0);
                 else
-                    PlayingPieceTiles.Add(boardPosition, new PlayingPieceTile(boardPosition, tile, tilemap, NewId(), player.Color, playingPieceType, player, false, 0));
+                    PlayingPieceTiles.Add(boardPosition, new PlayingPieceTile(boardPosition, tile.Tile, tilemap, NewId(), player.Color, playingPieceType, player, false, 0));
                 return PlayingPieceTiles[boardPosition];
             default: 
                 return null;

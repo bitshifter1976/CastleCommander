@@ -433,7 +433,7 @@ public class BoardController : MonoBehaviour
                     var position = new Vector3Int(x, y, 0);
                     tilesLandscape.Add(position, landscapeTile);
                     tilesUnderTiles.Add(position, landscapeTile == Ocean ? UnderOcean : UnderDirt);
-                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, landscapeTile, TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GetLandscapeType(landscapeTile));
+                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, GetLandscapeTileInfos().First(ti => ti.Tile == landscapeTile), TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GetLandscapeType(landscapeTile));
                 }
             }
             // add player castle tiles
@@ -447,8 +447,8 @@ public class BoardController : MonoBehaviour
             tilesUnderTiles[pos1] = UnderDirt;
             tilesLandscape[pos2] = Castle2;
             tilesUnderTiles[pos2] = UnderDirt;
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, Castle1, TilemapLandscape, Player1);
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, Castle2, TilemapLandscape, Player2);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GetLandscapeTileInfos().First(ti => ti.Tile == Base), TilemapLandscape, Player1);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GetLandscapeTileInfos().First(ti => ti.Tile == Base), TilemapLandscape, Player2);
         }
     }
 
@@ -562,7 +562,7 @@ public class BoardController : MonoBehaviour
             }
             if (tile != null)
             {
-                var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, TilemapPlayingPieces, ActivePlayer, playingPieceType);
+                var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, new TileInfo(tile, 1, 0), TilemapPlayingPieces, ActivePlayer, playingPieceType);
                 SelectPlayingPiece(tileInfo as PlayingPieceTile);
             }
             Destroy(selectUnitTypeBox);
