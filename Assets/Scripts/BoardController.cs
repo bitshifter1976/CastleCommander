@@ -60,6 +60,7 @@ public class BoardController : MonoBehaviour
     [Header("Tilemaps")]
     public Tilemap TilemapPlayingPieces;
     public Tilemap TilemapPath;
+    public Tilemap TilemapCastleSelect;
     public Tilemap TilemapLandscape;
     public Tilemap TilemapUnderTiles;
     [Header("Input")]
@@ -107,6 +108,7 @@ public class BoardController : MonoBehaviour
     public Tile UnderDirt;
     public Tile UnderOcean;
     public Tile Path;
+    public Tile Select;
     [Header("********** Info **********")]
     [Header("General")]
     public Player ActivePlayer;
@@ -239,6 +241,7 @@ public class BoardController : MonoBehaviour
             Timer.StopTimer();
             TilemapPlayingPieces.ClearAllTiles();
             TilemapPath.ClearAllTiles();
+            TilemapCastleSelect.ClearAllTiles();
             TilemapLandscape.ClearAllTiles();
             TilemapUnderTiles.ClearAllTiles();
             ActivePlayer = Player1;
@@ -274,6 +277,7 @@ public class BoardController : MonoBehaviour
                 break;
             case BoardState.PlayerGetReady:
                 ShowMessageBox($"player {ActivePlayer.PlayerId} get ready!", "go", null, BoardState.RollDiceStart);
+                SelectActiveCastle();
                 break;
             case BoardState.RollDiceStart:
                 PrepareDiceRoll();
@@ -302,11 +306,10 @@ public class BoardController : MonoBehaviour
                     State = BoardState.FinishRound;
                 break;
             case BoardState.FinishRound:
-                if (selectUnitTypeBox != null)
-                    Destroy(selectUnitTypeBox);
-                if (formerSelectedPlayingPiece != null)
-                    DeselectPlayingPiece(formerSelectedPlayingPiece);
+                HideSelectUnitTypeBox();
+                DeselectPlayingPiece(formerSelectedPlayingPiece);
                 TilemapPath.ClearAllTiles();
+                TilemapCastleSelect.ClearAllTiles();
                 Timer.StopTimer();
                 SwitchPlayer();
                 State = BoardState.PlayerGetReady;
@@ -314,6 +317,20 @@ public class BoardController : MonoBehaviour
             case BoardState.GameEnd:
                 break;
         }
+    }
+
+    private void HideSelectUnitTypeBox()
+    {
+        if (selectUnitTypeBox != null)
+            Destroy(selectUnitTypeBox);
+    }
+
+    private void SelectActiveCastle()
+    {
+        var selectedPlayingField = GameTiles.Instance.GetCastle(ActivePlayer.PlayerId);
+        var selectedCastle = Select;
+        selectedCastle.color = new Color(ActivePlayer.Color.r, ActivePlayer.Color.g, ActivePlayer.Color.b, AlphaSelected);
+        TilemapCastleSelect.SetTile(selectedPlayingField.BoardPosition, selectedCastle);
     }
 
     private bool RollDice1()
@@ -517,7 +534,7 @@ public class BoardController : MonoBehaviour
         // if own castle clicked, spawn playing piece
         else if (selectedCastle != null && selectedCastle.Player.PlayerId == ActivePlayer.PlayerId)
             PlacePlayingPiece(MouseHandler.SelectedLandscapeTilePosition);
-        
+
     }
 
     private void PlacePlayingPiece(Vector3Int position)
@@ -567,29 +584,29 @@ public class BoardController : MonoBehaviour
 
     private void DeselectPlayingPiece(PlayingPieceTile playingPiece)
     {
-        var origColor = playingPiece.Tile.color;
-        var color = new Color(origColor.r, origColor.g, origColor.b, AlphaUnselected);
-        playingPiece.Tile.color = color;
-        TilemapPlayingPieces.SetTile(playingPiece.BoardPosition, null);
-        TilemapPlayingPieces.SetTile(playingPiece.BoardPosition, playingPiece.Tile);
-        formerSelectedPlayingPiece = null;
-        MouseHandler.SelectedPlayingPiecePosition = Vector3Int.zero;
-        MouseHandler.SelectedPlayingPiece = null;
+        if (playingPiece != null)
+        {
+            var origColor = playingPiece.Tile.color;
+            var color = new Color(origColor.r, origColor.g, origColor.b, AlphaUnselected);
+            playingPiece.Tile.color = color;
+            TilemapPlayingPieces.SetTile(playingPiece.BoardPosition, null);
+            TilemapPlayingPieces.SetTile(playingPiece.BoardPosition, playingPiece.Tile);
+            formerSelectedPlayingPiece = null;
+            MouseHandler.SelectedPlayingPiecePosition = Vector3Int.zero;
+            MouseHandler.SelectedPlayingPiece = null;
+        }
     }
 
     private void MovePlayingPiece(PlayingPieceTile selectedPlayingPiece)
     {
-        var position = selectedPlayingPiece.BoardPosition;
-        var target = MouseHandler.SelectedLandscapeTilePosition;
-        //pathfinder.GenerateAstarPath(position, target, out MovementPath);
         if (MovementPath.Count > 0)
         {
             StopAllCoroutines();
-            StartCoroutine(Move());
+            StartCoroutine(MoveFormerSelectedPlayingPiece());
         }
     }
 
-    IEnumerator Move()
+    IEnumerator MoveFormerSelectedPlayingPiece()
     {
         MovementCosts = GameTiles.Instance.LandscapeTiles.Values.Where(t => MovementPath.Contains(t.BoardPosition)).Sum(t => t.MovementCost);
         if (MovementCosts <= PointsForMovement)

@@ -97,6 +97,11 @@ public class GameTiles : MonoBehaviour
         return (T)tile;
     }
 
+    public CastleTile GetCastle(uint playerId)
+    {
+        return CastleTiles.Select(tile => tile.Value).FirstOrDefault(tile => tile.Player.PlayerId == playerId);
+    }
+
     public int NewId()
     {
         return ++LastId;
