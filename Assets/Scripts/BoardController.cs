@@ -526,7 +526,7 @@ public class BoardController : MonoBehaviour
         if (formerSelectedPlayingPiece == null && selectedPlayingPiece != null && selectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
             SelectPlayingPiece(selectedPlayingPiece);
         // if prior selected playing piece, move it
-        else if (formerSelectedPlayingPiece != null && selectedLandscapeTile != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && GetLandscapeTilesForMovement().Contains(selectedLandscapeTile.Tile) && MovementPath != null && !tileToMoveToHasPlayingPiece)
+        else if (formerSelectedPlayingPiece != null && selectedLandscapeTile != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && MovementPath != null && !tileToMoveToHasPlayingPiece)
             MovePlayingPiece(formerSelectedPlayingPiece);
         // if prior selected playing piece selected again, deselect it
         else if (formerSelectedPlayingPiece != null && selectedPlayingPiece != null && formerSelectedPlayingPiece == selectedPlayingPiece)
@@ -534,7 +534,6 @@ public class BoardController : MonoBehaviour
         // if own castle clicked, spawn playing piece
         else if (selectedCastle != null && selectedCastle.Player.PlayerId == ActivePlayer.PlayerId)
             PlacePlayingPiece(MouseHandler.SelectedLandscapeTilePosition);
-
     }
 
     private void PlacePlayingPiece(Vector3Int position)
