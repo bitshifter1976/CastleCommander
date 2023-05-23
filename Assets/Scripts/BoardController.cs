@@ -53,6 +53,8 @@ public class BoardController : MonoBehaviour
     public GameObject Hud;
     public Button ButtonReload;
     public Button ButtonEndTurn;
+    public Button ButtonShowUnitTypeInfo;
+    public Button ButtonHideUnitTypeInfo;
     public Timer Timer;
     public GameObject MessageBox;
     public Button MessageBoxButtonOk;
@@ -61,6 +63,7 @@ public class BoardController : MonoBehaviour
     public TextMeshProUGUI MessageBoxButtonOkText;
     public TextMeshProUGUI MessageBoxButtonCancelText;
     public GameObject SelectUnitTypePrefab;
+    public GameObject UnitTypeInfo;
     [Header("Dices")]
     public List<Dice> Dices;
     [Header("Timeouts")]
@@ -93,7 +96,7 @@ public class BoardController : MonoBehaviour
     private TMP_Dropdown selectUnitTypeDropdown;
     #endregion
 
-    private void ShowMessageBox(string message, string buttonTextOk = "ok", string buttonTextCancel = null, BoardState? stateToTrigger = null)
+    private void ShowMessageBox(string message, string buttonTextOk = "ok", string buttonTextCancel = null, BoardState? stateToTriggerOnOk = null, BoardState? stateToTriggerOnCancel = null)
     {
         if (!MessageBox.activeSelf)
         {
@@ -106,8 +109,8 @@ public class BoardController : MonoBehaviour
             {
                 MessageBoxButtonOk.onClick.RemoveAllListeners();
                 MessageBox.SetActive(false);
-                if (stateToTrigger.HasValue)
-                    State = stateToTrigger.Value;
+                if (stateToTriggerOnOk.HasValue)
+                    State = stateToTriggerOnOk.Value;
             }); 
             // button cancel
             var buttonCancelEnabled = !string.IsNullOrEmpty(buttonTextCancel);
@@ -117,6 +120,8 @@ public class BoardController : MonoBehaviour
             {
                 MessageBoxButtonCancel.onClick.RemoveAllListeners();
                 MessageBox.SetActive(false);
+                if (stateToTriggerOnCancel.HasValue)
+                    State = stateToTriggerOnCancel.Value;
             });
             MessageBox.SetActive(true);
         }
@@ -128,8 +133,20 @@ public class BoardController : MonoBehaviour
         ActivePlayer = Player1;
         pathfinder = new Pathfinder<Vector3Int>(DistanceFunc, ConnectionsAndCosts);
         ButtonReload.onClick.AddListener(OnReloadClick);
+        ButtonShowUnitTypeInfo.onClick.AddListener(OnShowUnitTypeInfo);
+        ButtonHideUnitTypeInfo.onClick.AddListener(OnHideUnitTypeInfo);
         ButtonEndTurn.onClick.AddListener(OnEndTurn);
         MouseHandler.OnClick += OnBoardClick;
+    }
+
+    private void OnHideUnitTypeInfo()
+    {
+        UnitTypeInfo.SetActive(false);
+    }
+
+    private void OnShowUnitTypeInfo()
+    {
+        UnitTypeInfo.SetActive(true);
     }
 
     private void OnEndTurn()
@@ -140,7 +157,8 @@ public class BoardController : MonoBehaviour
 
     private void OnReloadClick()
     {
-        State = BoardState.ConfirmLoad;
+        if (State == BoardState.PlayRound)
+            State = BoardState.ConfirmLoad;
     }
 
     private void SwitchPlayer()
@@ -154,7 +172,7 @@ public class BoardController : MonoBehaviour
         {
             case BoardState.ConfirmLoad:
                 {
-                    ShowMessageBox("do you want to abort the game\nand load a new board?", "yes", "no", BoardState.Load);
+                    ShowMessageBox("do you want to abort the game\nand load a new board?", "yes", "no", BoardState.Load, BoardState.PlayRound);
                     break;
                 }
             case BoardState.Load:
