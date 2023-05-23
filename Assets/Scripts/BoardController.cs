@@ -8,8 +8,6 @@ using Random = UnityEngine.Random;
 using UnityEngine.UI;
 using TMPro;
 using Aoiti.Pathfinding;
-using System.IO;
-using Unity.VisualScripting;
 
 public class BoardController : MonoBehaviour
 {
@@ -18,20 +16,6 @@ public class BoardController : MonoBehaviour
     { 
         WholeBoard 
     };
-
-    public class TileInfo
-    {
-        public Tile Tile;
-        public float Probability; // value between 1 and 0 
-        public int MovementCosts;
-
-        public TileInfo(Tile tile, float probability, int movementCosts)
-        {
-            Tile = tile;
-            Probability = probability;
-            MovementCosts = movementCosts;
-        }
-    }
 
     public enum BoardState
     {
@@ -86,22 +70,6 @@ public class BoardController : MonoBehaviour
     [Header("Playing piece")]
     public float AlphaSelected = 1f;
     public float AlphaUnselected = 100f/256f;
-    [Header("********** Tiles **********")]
-    public Tile Base;
-    public Tile Desert;
-    public Tile LeafForest;
-    public Tile PineForest;
-    public Tile Jungle;
-    public Tile Mountain;
-    public Tile Ocean;
-    public Tile Grass;
-    public Tile Castle1;
-    public Tile Castle2;
-    public Tile Volcano;
-    public Tile UnderDirt;
-    public Tile UnderOcean;
-    public Tile Path;
-    public Tile Select;
     [Header("********** Info **********")]
     [Header("General")]
     public Player ActivePlayer;
@@ -124,35 +92,6 @@ public class BoardController : MonoBehaviour
     private GameObject selectUnitTypeBox;
     private TMP_Dropdown selectUnitTypeDropdown;
     #endregion
-
-    public List<TileInfo> GetLandscapeTileInfos()
-    {
-        return new List<TileInfo>
-        {
-            new TileInfo(Grass,         1.0f,   10),
-            new TileInfo(LeafForest,    0.5f,   20),
-            new TileInfo(Desert,        0.5f,   30),
-            new TileInfo(Jungle,        0.5f,   30),
-            new TileInfo(Mountain,      0.4f,   100),
-            new TileInfo(Ocean,         0.4f,   100), 
-            new TileInfo(Base,          0.2f,   10), 
-            new TileInfo(PineForest,    0.2f,   20), 
-            new TileInfo(Volcano,       0.05f,  100) 
-        };
-    }
-
-    public List<Tile> GetLandscapeTilesForMovement()
-    {
-        return new List<Tile>
-        {
-            Grass,
-            LeafForest,
-            Desert,
-            Jungle,
-            Base,
-            PineForest
-        };
-    }
 
     private void ShowMessageBox(string message, string buttonTextOk = "ok", string buttonTextCancel = null, BoardState? stateToTrigger = null)
     {
@@ -187,8 +126,6 @@ public class BoardController : MonoBehaviour
     {
         MessageBox.SetActive(false);
         ActivePlayer = Player1;
-        GameTiles.Instance.TileInfos = GetLandscapeTileInfos();
-        GameTiles.Instance.TilesForMovement = GetLandscapeTilesForMovement();
         pathfinder = new Pathfinder<Vector3Int>(DistanceFunc, ConnectionsAndCosts);
         ButtonReload.onClick.AddListener(OnReloadClick);
         ButtonEndTurn.onClick.AddListener(OnEndTurn);
@@ -211,28 +148,6 @@ public class BoardController : MonoBehaviour
         ActivePlayer = ActivePlayer == Player1 ? Player2 : Player1;
     }
 
-    public bool LoadBoard()
-    {
-        var result = false;
-        try
-        {
-            Timer.StopTimer();
-            TilemapPlayingPieces.ClearAllTiles();
-            TilemapPath.ClearAllTiles();
-            TilemapCastleSelect.ClearAllTiles();
-            TilemapLandscape.ClearAllTiles();
-            TilemapUnderTiles.ClearAllTiles();
-            ActivePlayer = Player1;
-            CreateBoard();
-            result = true;
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
-        return result;
-    }
-
     private void Update()
     {
         switch (State)
@@ -244,8 +159,8 @@ public class BoardController : MonoBehaviour
                 }
             case BoardState.Load:
                 {
-                    if (LoadBoard())
-                        State = BoardState.CreateBoard;
+                    LoadBoard();
+                    State = BoardState.CreateBoard;
                     break;
                 }
             case BoardState.CreateBoard:
@@ -310,117 +225,52 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private void HideSelectUnitTypeBox()
+    public void LoadBoard()
     {
-        if (selectUnitTypeBox != null)
-            Destroy(selectUnitTypeBox);
-    }
-
-    private void SelectActiveCastle()
-    {
-        var selectedPlayingField = GameTiles.Instance.GetCastle(ActivePlayer.PlayerId);
-        var selectedCastle = Select;
-        selectedCastle.color = new Color(ActivePlayer.Color.r, ActivePlayer.Color.g, ActivePlayer.Color.b, AlphaSelected);
-        TilemapCastleSelect.SetTile(selectedPlayingField.BoardPosition, selectedCastle);
-    }
-
-    private void ShowPath()
-    {
+        Timer.StopTimer();
+        TilemapPlayingPieces.ClearAllTiles();
         TilemapPath.ClearAllTiles();
-        if (formerSelectedPlayingPiece != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
-        {
-            pathfinder.GenerateAstarPath(formerSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition, out var path);
-            var costs = 0;
-            var movementPossible = true;
-            foreach (var position in path)
-            {
-                var tile = GameTiles.Instance.Get<LandscapeTile>(position);
-                var playingPiece = GameTiles.Instance.Get<PlayingPieceTile>(position);
-                costs += tile.MovementCost;
-                var pathTile = Path;
-                if (tile.Movable && costs <= PointsForMovement && playingPiece == null && movementPossible)
-                {
-                    pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, AlphaUnselected);
-                }
-                else
-                {
-                    movementPossible = false;
-                    pathTile.color = new Color(Color.red.r, Color.red.g, Color.red.b, AlphaUnselected);
-                }
-                TilemapPath.SetTile(position, pathTile);
-            }
-            MovementPath = movementPossible ? path : null;
-        }
+        TilemapCastleSelect.ClearAllTiles();
+        TilemapLandscape.ClearAllTiles();
+        TilemapUnderTiles.ClearAllTiles();
+        ActivePlayer = Player1;
+        CreateBoard();
     }
 
     private void CreateBoard()
     {
         if (GeneratorMode == BoardMode.WholeBoard)
         {
-            var xMin = -BoardWidth  / 2;
-            var xMax = BoardWidth   / 2;
+            var xMin = -BoardWidth / 2;
+            var xMax = BoardWidth / 2;
             var yMin = -BoardHeight / 2;
-            var yMax = BoardHeight  / 2;
+            var yMax = BoardHeight / 2;
             // add landscape tiles with its' under tiles
             for (var x = xMin; x <= xMax; x++)
             {
                 for (var y = yMax; y >= yMin; y--)
                 {
-                    var landscapeTile = GetRandomLandscapeTile();
+                    var landscapeTile = GameTiles.Instance.GetRandomLandscapeTile();
                     var position = new Vector3Int(x, y, 0);
                     tilesLandscape.Add(position, landscapeTile);
-                    tilesUnderTiles.Add(position, landscapeTile == Ocean ? UnderOcean : UnderDirt);
-                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, GetLandscapeTileInfos().First(ti => ti.Tile == landscapeTile), TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GetLandscapeType(landscapeTile));
+                    tilesUnderTiles.Add(position, landscapeTile == GameTiles.Instance.Ocean ? GameTiles.Instance.UnderOcean : GameTiles.Instance.UnderDirt);
+                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == landscapeTile), TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GameTiles.Instance.GetLandscapeType(landscapeTile));
                 }
             }
             // add player castle tiles
-            var x1 = xMin+1;
-            var x2 = xMax-1;
+            var x1 = xMin + 1;
+            var x2 = xMax - 1;
             var y1 = Random.Range(yMin, yMax);
             var y2 = Random.Range(yMin, yMax);
             var pos1 = new Vector3Int(x1, y1, 0);
             var pos2 = new Vector3Int(x2, y2, 0);
-            tilesLandscape[pos1] = Castle1;
-            tilesUnderTiles[pos1] = UnderDirt;
-            tilesLandscape[pos2] = Castle2;
-            tilesUnderTiles[pos2] = UnderDirt;
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GetLandscapeTileInfos().First(ti => ti.Tile == Base), TilemapLandscape, Player1);
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GetLandscapeTileInfos().First(ti => ti.Tile == Base), TilemapLandscape, Player2);
+            tilesLandscape[pos1] = GameTiles.Instance.Castle1;
+            tilesUnderTiles[pos1] = GameTiles.Instance.UnderDirt;
+            tilesLandscape[pos2] = GameTiles.Instance.Castle2;
+            tilesUnderTiles[pos2] = GameTiles.Instance.UnderDirt;
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == GameTiles.Instance.Base), TilemapLandscape, Player1);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == GameTiles.Instance.Base), TilemapLandscape, Player2);
         }
-    }
-
-    private LandscapeTile.LandscapeTileType GetLandscapeType(Tile landscapeTile)
-    {
-        if (landscapeTile == Base)
-            return LandscapeTile.LandscapeTileType.Base;
-        else if (landscapeTile == Desert)
-            return LandscapeTile.LandscapeTileType.Desert;
-        else if (landscapeTile == Grass)
-            return LandscapeTile.LandscapeTileType.Grass;
-        else if (landscapeTile == Jungle)
-            return LandscapeTile.LandscapeTileType.Jungle;
-        else if (landscapeTile == LeafForest)
-            return LandscapeTile.LandscapeTileType.LeafForest;
-        else if (landscapeTile == Mountain)
-            return LandscapeTile.LandscapeTileType.Mountain;
-        else if (landscapeTile == Ocean)
-            return LandscapeTile.LandscapeTileType.Ocean;
-        else if (landscapeTile == PineForest)
-            return LandscapeTile.LandscapeTileType.PineForest;
-        else if (landscapeTile == Volcano)
-            return LandscapeTile.LandscapeTileType.Volcano;
-
-        return LandscapeTile.LandscapeTileType.None;
-    }
-
-    private Tile GetRandomLandscapeTile()
-    {
-        var probability = Random.Range(0f, 1f);
-        var tiles = GetLandscapeTileInfos();
-        var possibleTiles = tiles.Where(t => t.Probability >= probability).Select(s => s.Tile).ToList();
-        if (possibleTiles.Count == 0)
-            possibleTiles.Add(tiles[Random.Range(0, tiles.Count)].Tile);
-        return possibleTiles[Random.Range(0, possibleTiles.Count)];       
     }
 
     private bool AddTile()
@@ -446,6 +296,49 @@ public class BoardController : MonoBehaviour
         }
 
         return tileCreated;
+    }
+
+    private void HideSelectUnitTypeBox()
+    {
+        if (selectUnitTypeBox != null)
+            Destroy(selectUnitTypeBox);
+    }
+
+    private void SelectActiveCastle()
+    {
+        var selectedPlayingField = GameTiles.Instance.GetCastle(ActivePlayer.PlayerId);
+        var selectedCastle = GameTiles.Instance.Select;
+        selectedCastle.color = new Color(ActivePlayer.Color.r, ActivePlayer.Color.g, ActivePlayer.Color.b, AlphaSelected);
+        TilemapCastleSelect.SetTile(selectedPlayingField.BoardPosition, selectedCastle);
+    }
+
+    private void ShowPath()
+    {
+        TilemapPath.ClearAllTiles();
+        if (formerSelectedPlayingPiece != null && formerSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
+        {
+            pathfinder.GenerateAstarPath(formerSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition, out var path);
+            var costs = 0;
+            var movementPossible = true;
+            foreach (var position in path)
+            {
+                var tile = GameTiles.Instance.Get<LandscapeTile>(position);
+                var playingPiece = GameTiles.Instance.Get<PlayingPieceTile>(position);
+                costs += tile.MovementCost;
+                var pathTile = GameTiles.Instance.Path;
+                if (tile.Movable && costs <= PointsForMovement && playingPiece == null && movementPossible)
+                {
+                    pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, AlphaUnselected);
+                }
+                else
+                {
+                    movementPossible = false;
+                    pathTile.color = new Color(Color.red.r, Color.red.g, Color.red.b, AlphaUnselected);
+                }
+                TilemapPath.SetTile(position, pathTile);
+            }
+            MovementPath = movementPossible ? path : null;
+        }
     }
 
     private void OnBoardClick(object sender, EventArgs e)

@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Dice : MonoBehaviour
 {
@@ -29,8 +26,8 @@ public class Dice : MonoBehaviour
     private void Start()
     {
         currentFrame = GetComponent<SpriteRenderer>();
-        diceAnimation = GetComponent<Animator>();
         currentFrame.color = Player.Color;
+        diceAnimation = GetComponent<Animator>();
         diceAnimation.enabled = false;
         timeElapsed = 0;
     }

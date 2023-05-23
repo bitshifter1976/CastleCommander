@@ -991,7 +991,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 159.08594, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &152324907
@@ -1473,7 +1473,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 17.49, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &297753489
@@ -2026,21 +2026,6 @@ MonoBehaviour:
   TimeToMovePlayingPieceSec: 0.1
   AlphaSelected: 1
   AlphaUnselected: 0.390625
-  Base: {fileID: 11400000, guid: 055fc954acdec0c449737151144e1b7c, type: 2}
-  Desert: {fileID: 11400000, guid: b62249a4f94a80b4f8b4294c2e096f36, type: 2}
-  LeafForest: {fileID: 11400000, guid: aee732d35069dd24faf060c200577a17, type: 2}
-  PineForest: {fileID: 11400000, guid: 7b29b5f8953ef96419abfd39edfa73b5, type: 2}
-  Jungle: {fileID: 11400000, guid: 9fe82e7bc0a6d86449e7f59d0d9f92ba, type: 2}
-  Mountain: {fileID: 11400000, guid: ff318adc52d4b394787c29852a7e5873, type: 2}
-  Ocean: {fileID: 11400000, guid: 946a2f09edec3034fbc62de22882abc1, type: 2}
-  Grass: {fileID: 11400000, guid: 71b80c7a431908d4ab5e16412b11a975, type: 2}
-  Castle1: {fileID: 11400000, guid: 244f9909dcb49904a9da3dc6189e2cbc, type: 2}
-  Castle2: {fileID: 11400000, guid: dbbbdca9982f71b47bb6c10be306325d, type: 2}
-  Volcano: {fileID: 11400000, guid: 985964a563fc7734cb95e8dddc03dde1, type: 2}
-  UnderDirt: {fileID: 11400000, guid: a121856c503759e41befa6bba03f0b81, type: 2}
-  UnderOcean: {fileID: 11400000, guid: f7bf4c8ef33a97a42801942c6767d931, type: 2}
-  Path: {fileID: 11400000, guid: 4beb653cc2dbac546935be8beebfb73a, type: 2}
-  Select: {fileID: 11400000, guid: 8acf4c07152c32043b7e3d239ec2d91d, type: 2}
   ActivePlayer: {fileID: 0}
   State: 0
   PointsForMovement: 0
@@ -2379,7 +2364,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -2389,7 +2374,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -2409,7 +2394,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -2429,7 +2414,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -2466,12 +2451,12 @@ Tilemap:
   m_TileColorArray:
   - m_RefCount: 0
     m_Data: {r: 3.3617e-41, g: 3.3617e-41, b: 3.3617e-41, a: 3.3617e-41}
-  - m_RefCount: 6
+  - m_RefCount: 2
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   - m_RefCount: 0
     m_Data: {r: 3.3774e-41, g: 3.3774e-41, b: 3.3774e-41, a: 3.3774e-41}
-  - m_RefCount: 0
-    m_Data: {r: 3.3774e-41, g: 3.3774e-41, b: 3.3774e-41, a: 3.3774e-41}
+  - m_RefCount: 4
+    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2671,7 +2656,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -2681,7 +2666,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -2701,7 +2686,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -2721,7 +2706,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -2758,12 +2743,12 @@ Tilemap:
   m_TileColorArray:
   - m_RefCount: 0
     m_Data: {r: 3.3617e-41, g: 3.3617e-41, b: 3.3617e-41, a: 3.3617e-41}
-  - m_RefCount: 6
+  - m_RefCount: 2
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   - m_RefCount: 0
     m_Data: {r: 3.3774e-41, g: 3.3774e-41, b: 3.3774e-41, a: 3.3774e-41}
-  - m_RefCount: 0
-    m_Data: {r: 3.3774e-41, g: 3.3774e-41, b: 3.3774e-41, a: 3.3774e-41}
+  - m_RefCount: 4
+    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -5000,7 +4985,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 65.25, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1899748592
@@ -5306,6 +5291,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LastId: 0
   TilesForMovement: []
+  Base: {fileID: 11400000, guid: 055fc954acdec0c449737151144e1b7c, type: 2}
+  Desert: {fileID: 11400000, guid: b62249a4f94a80b4f8b4294c2e096f36, type: 2}
+  LeafForest: {fileID: 11400000, guid: aee732d35069dd24faf060c200577a17, type: 2}
+  PineForest: {fileID: 11400000, guid: 7b29b5f8953ef96419abfd39edfa73b5, type: 2}
+  Jungle: {fileID: 11400000, guid: 9fe82e7bc0a6d86449e7f59d0d9f92ba, type: 2}
+  Mountain: {fileID: 11400000, guid: ff318adc52d4b394787c29852a7e5873, type: 2}
+  Ocean: {fileID: 11400000, guid: 946a2f09edec3034fbc62de22882abc1, type: 2}
+  Grass: {fileID: 11400000, guid: 71b80c7a431908d4ab5e16412b11a975, type: 2}
+  Castle1: {fileID: 11400000, guid: 244f9909dcb49904a9da3dc6189e2cbc, type: 2}
+  Castle2: {fileID: 11400000, guid: dbbbdca9982f71b47bb6c10be306325d, type: 2}
+  Volcano: {fileID: 11400000, guid: 985964a563fc7734cb95e8dddc03dde1, type: 2}
+  UnderDirt: {fileID: 11400000, guid: a121856c503759e41befa6bba03f0b81, type: 2}
+  UnderOcean: {fileID: 11400000, guid: f7bf4c8ef33a97a42801942c6767d931, type: 2}
+  Path: {fileID: 11400000, guid: 4beb653cc2dbac546935be8beebfb73a, type: 2}
+  Select: {fileID: 11400000, guid: 8acf4c07152c32043b7e3d239ec2d91d, type: 2}
 --- !u!1 &2125991620
 GameObject:
   m_ObjectHideFlags: 0

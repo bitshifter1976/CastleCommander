@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using static BoardController;
+using Random = UnityEngine.Random;
 
 public class GameTiles : MonoBehaviour
 {
@@ -16,16 +16,97 @@ public class GameTiles : MonoBehaviour
     public List<TileInfo> TileInfos;
     public List<Tile> TilesForMovement;
 
+    public Tile Base;
+    public Tile Desert;
+    public Tile LeafForest;
+    public Tile PineForest;
+    public Tile Jungle;
+    public Tile Mountain;
+    public Tile Ocean;
+    public Tile Grass;
+    public Tile Castle1;
+    public Tile Castle2;
+    public Tile Volcano;
+    public Tile UnderDirt;
+    public Tile UnderOcean;
+    public Tile Path;
+    public Tile Select;
+
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            Instance.TileInfos = GetLandscapeTileInfos();
+            Instance.TilesForMovement = GetLandscapeTilesForMovement();
         }
         else if (Instance != this)
         {
             Destroy(gameObject);
         }
+    }
+
+    public List<TileInfo> GetLandscapeTileInfos()
+    {
+        return new List<TileInfo>
+        {
+            new TileInfo(Grass,         1.0f,   10),
+            new TileInfo(LeafForest,    0.5f,   20),
+            new TileInfo(Desert,        0.5f,   30),
+            new TileInfo(Jungle,        0.5f,   30),
+            new TileInfo(Mountain,      0.4f,   100),
+            new TileInfo(Ocean,         0.4f,   100),
+            new TileInfo(Base,          0.2f,   10),
+            new TileInfo(PineForest,    0.2f,   20),
+            new TileInfo(Volcano,       0.05f,  100)
+        };
+    }
+
+    private List<Tile> GetLandscapeTilesForMovement()
+    {
+        return new List<Tile>
+        {
+            Grass,
+            LeafForest,
+            Desert,
+            Jungle,
+            Base,
+            PineForest
+        };
+    }
+
+    public LandscapeTile.LandscapeTileType GetLandscapeType(Tile landscapeTile)
+    {
+        if (landscapeTile == Base)
+            return LandscapeTile.LandscapeTileType.Base;
+        else if (landscapeTile == Desert)
+            return LandscapeTile.LandscapeTileType.Desert;
+        else if (landscapeTile == Grass)
+            return LandscapeTile.LandscapeTileType.Grass;
+        else if (landscapeTile == Jungle)
+            return LandscapeTile.LandscapeTileType.Jungle;
+        else if (landscapeTile == LeafForest)
+            return LandscapeTile.LandscapeTileType.LeafForest;
+        else if (landscapeTile == Mountain)
+            return LandscapeTile.LandscapeTileType.Mountain;
+        else if (landscapeTile == Ocean)
+            return LandscapeTile.LandscapeTileType.Ocean;
+        else if (landscapeTile == PineForest)
+            return LandscapeTile.LandscapeTileType.PineForest;
+        else if (landscapeTile == Volcano)
+            return LandscapeTile.LandscapeTileType.Volcano;
+
+        return LandscapeTile.LandscapeTileType.None;
+    }
+
+    public Tile GetRandomLandscapeTile()
+    {
+        var probability = Random.Range(0f, 1f);
+        var tiles = GetLandscapeTileInfos();
+        var possibleTiles = tiles.Where(t => t.Probability >= probability).Select(s => s.Tile).ToList();
+        if (possibleTiles.Count == 0)
+            possibleTiles.Add(tiles[Random.Range(0, tiles.Count)].Tile);
+        return possibleTiles[Random.Range(0, possibleTiles.Count)];
     }
 
     public PlayingPieceTile Move(PlayingPieceTile tile, Vector3Int newPosition)
