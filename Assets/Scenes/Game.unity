@@ -991,7 +991,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 159.08594, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &152324907
@@ -1180,6 +1180,7 @@ GameObject:
   - component: {fileID: 213031934}
   - component: {fileID: 213031936}
   - component: {fileID: 213031935}
+  - component: {fileID: 213031937}
   m_Layer: 3
   m_Name: Dice4
   m_TagString: Untagged
@@ -1275,6 +1276,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &213031937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 213031933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbc62ca62a57604a886e06640e3cd15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Result: 0
+  Player: {fileID: 471920381}
 --- !u!1 &234897391
 GameObject:
   m_ObjectHideFlags: 0
@@ -1458,7 +1473,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 17.49, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &297753489
@@ -2001,14 +2016,11 @@ MonoBehaviour:
   MessageBoxButtonOkText: {fileID: 1617464720}
   MessageBoxButtonCancelText: {fileID: 1515794676}
   SelectUnitTypePrefab: {fileID: 3138181463965176858, guid: cacf0cfbb4f185942ad1261591d542ab, type: 3}
-  Dice1Animation: {fileID: 1319223088}
-  Dice2Animation: {fileID: 1670868627}
-  Dice3Animation: {fileID: 1272208300}
-  Dice4Animation: {fileID: 213031935}
-  Dice1CurrentFrame: {fileID: 1319223089}
-  Dice2CurrentFrame: {fileID: 1670868628}
-  Dice3CurrentFrame: {fileID: 1272208301}
-  Dice4CurrentFrame: {fileID: 213031936}
+  Dices:
+  - {fileID: 1319223091}
+  - {fileID: 1670868629}
+  - {fileID: 1272208302}
+  - {fileID: 213031937}
   TimeToAddTileSec: 0.01
   TimeToEndRoundSec: 30
   TimeToMovePlayingPieceSec: 0.1
@@ -2031,12 +2043,6 @@ MonoBehaviour:
   Select: {fileID: 11400000, guid: 8acf4c07152c32043b7e3d239ec2d91d, type: 2}
   ActivePlayer: {fileID: 0}
   State: 0
-  TimeToRollDice1Sec: 0
-  TimeToRollDice2Sec: 0
-  Dice1Result: 0
-  Dice2Result: 0
-  Dice3Result: 0
-  Dice4Result: 0
   PointsForMovement: 0
   MovementCosts: 0
   MovementPath: []
@@ -3424,6 +3430,7 @@ GameObject:
   - component: {fileID: 1272208299}
   - component: {fileID: 1272208301}
   - component: {fileID: 1272208300}
+  - component: {fileID: 1272208302}
   m_Layer: 3
   m_Name: Dice3
   m_TagString: Untagged
@@ -3519,6 +3526,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1272208302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272208298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbc62ca62a57604a886e06640e3cd15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Result: 0
+  Player: {fileID: 471920381}
 --- !u!1 &1316996037
 GameObject:
   m_ObjectHideFlags: 0
@@ -3606,6 +3627,7 @@ GameObject:
   - component: {fileID: 1319223090}
   - component: {fileID: 1319223089}
   - component: {fileID: 1319223088}
+  - component: {fileID: 1319223091}
   m_Layer: 3
   m_Name: Dice1
   m_TagString: Untagged
@@ -3701,6 +3723,20 @@ Transform:
   m_Father: {fileID: 1173587251}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1319223091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319223087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbc62ca62a57604a886e06640e3cd15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Result: 0
+  Player: {fileID: 2076343}
 --- !u!1 &1515794674
 GameObject:
   m_ObjectHideFlags: 0
@@ -4056,6 +4092,7 @@ GameObject:
   - component: {fileID: 1670868626}
   - component: {fileID: 1670868628}
   - component: {fileID: 1670868627}
+  - component: {fileID: 1670868629}
   m_Layer: 3
   m_Name: Dice2
   m_TagString: Untagged
@@ -4151,6 +4188,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1670868629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670868625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbc62ca62a57604a886e06640e3cd15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Result: 0
+  Player: {fileID: 2076343}
 --- !u!1 &1722963794
 GameObject:
   m_ObjectHideFlags: 0
@@ -4949,7 +5000,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 65.25, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1899748592
