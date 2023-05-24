@@ -78,8 +78,6 @@ public class BoardController : MonoBehaviour
     public Player ActivePlayer;
     public BoardState State = BoardState.Load;
     [Header("Playing piece movement")]
-    public int PointsForMovement;
-    public int MovementCosts;
     public List<Vector3Int> MovementPath;
     public Vector3Int[] MovementDirectionsOdd  = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
     public Vector3Int[] MovementDirectionsEven = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(-1, 1, 0)/*top-left*/, new Vector3Int(0, 1, 0)/*top-right*/, new Vector3Int(-1, -1, 0)/*bottom-left*/, new Vector3Int(0, -1, 0)/*bottom-right*/ };
@@ -131,6 +129,8 @@ public class BoardController : MonoBehaviour
     {
         MessageBox.SetActive(false);
         ActivePlayer = Player1;
+        Player1.Active = true;
+        Player2.Active = false;
         pathfinder = new Pathfinder<Vector3Int>(DistanceFunc, ConnectionsAndCosts);
         ButtonReload.onClick.AddListener(OnReloadClick);
         ButtonShowUnitTypeInfo.onClick.AddListener(OnShowUnitTypeInfo);
@@ -163,7 +163,18 @@ public class BoardController : MonoBehaviour
 
     private void SwitchPlayer()
     {
-        ActivePlayer = ActivePlayer == Player1 ? Player2 : Player1;
+        if (ActivePlayer == Player1)
+        {
+            ActivePlayer = Player2;
+            Player1.Active = false;
+            Player2.Active = true;
+        }
+        else
+        {
+            ActivePlayer = Player1;
+            Player1.Active = true;
+            Player2.Active = false;
+        }
     }
 
     private void Update()
@@ -211,7 +222,7 @@ public class BoardController : MonoBehaviour
                     var activeDices = Dices.Where(d => d.Player.PlayerId == ActivePlayer.PlayerId).ToList();
                     if (activeDices.All(d => d.RollingFinished()))
                     {
-                        PointsForMovement = activeDices.Sum(d => d.Result) * 10;
+                        ActivePlayer.PointsLeft = activeDices.Sum(d => d.Result) * 10;
                         Timer.StartTimer(TimeToEndRoundSec);
                         State = BoardState.PlayRound;
                     }
@@ -220,8 +231,7 @@ public class BoardController : MonoBehaviour
             case BoardState.PlayRound:
                 {
                     ShowPath();
-                    // round over?
-                    if (Timer.IsOver() || PointsForMovement <= 0)
+                    if (Timer.IsOver() || ActivePlayer.PointsLeft <= 0)
                         State = BoardState.FinishRound;
                     break;
                 }
@@ -251,6 +261,14 @@ public class BoardController : MonoBehaviour
         TilemapCastleSelect.ClearAllTiles();
         TilemapLandscape.ClearAllTiles();
         TilemapUnderTiles.ClearAllTiles();
+        Player1.PointsLeft = 0;
+        Player1.SpawnsLeft = 10;
+        Player1.UnitCount = 0;
+        Player1.UnitDeadCount = 0;
+        Player2.PointsLeft = 0;
+        Player2.SpawnsLeft = 10;
+        Player2.UnitCount = 0;
+        Player2.UnitDeadCount = 0;
         ActivePlayer = Player1;
         CreateBoard();
     }
@@ -344,7 +362,7 @@ public class BoardController : MonoBehaviour
                 var playingPiece = GameTiles.Instance.Get<PlayingPieceTile>(position);
                 costs += tile.MovementCost;
                 var pathTile = GameTiles.Instance.Path;
-                if (tile.Movable && costs <= PointsForMovement && playingPiece == null && movementPossible)
+                if (tile.Movable && costs <= ActivePlayer.PointsLeft && playingPiece == null && movementPossible)
                 {
                     pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, AlphaUnselected);
                 }
@@ -408,11 +426,9 @@ public class BoardController : MonoBehaviour
                     tile = ActivePlayer.MedicTile;
                     break;
             }
-            if (tile != null)
-            {
-                var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, new TileInfo(tile, 1, 0), TilemapPlayingPieces, ActivePlayer, playingPieceType);
-                SelectPlayingPiece(tileInfo as PlayingPieceTile);
-            }
+            ActivePlayer.SpawnsLeft--;
+            var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, new TileInfo(tile, 1, 0), TilemapPlayingPieces, ActivePlayer, playingPieceType);
+            SelectPlayingPiece(tileInfo as PlayingPieceTile);
             Destroy(selectUnitTypeBox);
         });
     }
@@ -455,8 +471,8 @@ public class BoardController : MonoBehaviour
 
     IEnumerator MoveFormerSelectedPlayingPiece()
     {
-        MovementCosts = GameTiles.Instance.LandscapeTiles.Values.Where(t => MovementPath.Contains(t.BoardPosition)).Sum(t => t.MovementCost);
-        if (MovementCosts <= PointsForMovement)
+        var movementCosts = GameTiles.Instance.LandscapeTiles.Values.Where(t => MovementPath.Contains(t.BoardPosition)).Sum(t => t.MovementCost);
+        if (movementCosts <= ActivePlayer.PointsLeft)
         {
             while (MovementPath.Count > 0)
             {
@@ -476,7 +492,7 @@ public class BoardController : MonoBehaviour
                 yield return new WaitForSeconds(TimeToMovePlayingPieceSec);
             }
             // calculate points for movement
-            PointsForMovement -= MovementCosts;
+            ActivePlayer.PointsLeft -= movementCosts;
         }
     }
 
