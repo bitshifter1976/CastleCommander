@@ -7,12 +7,13 @@ public class Player : MonoBehaviour
     public uint PlayerId;
     public Color Color;
     public Color ColorInactive;
-    public Tile InfantryTile; 
     public Tile ArtilleryTile;
+    public Tile CavalryTile;
+    public Tile InfantryTile; 
     public Tile MedicTile;
     public int PointsLeft;
     public int SpawnsLeft;
     public int UnitCount;
     public int UnitDeadCount;
-    internal bool Active;
+    public bool Active;
 }

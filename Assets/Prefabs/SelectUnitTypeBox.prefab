@@ -916,9 +916,11 @@ MonoBehaviour:
   m_Value: -1
   m_Options:
     m_Options:
-    - m_Text: Infantry
-      m_Image: {fileID: 0}
     - m_Text: Artillery
+      m_Image: {fileID: 0}
+    - m_Text: Cavalry
+      m_Image: {fileID: 0}
+    - m_Text: Infantry
       m_Image: {fileID: 0}
     - m_Text: Medic
       m_Image: {fileID: 0}

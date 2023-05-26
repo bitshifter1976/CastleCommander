@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static PlayingPieceTile;
 using Random = UnityEngine.Random;
 
 public class GameTiles : MonoBehaviour
@@ -13,7 +14,8 @@ public class GameTiles : MonoBehaviour
     public Dictionary<Vector3, LandscapeTile> LandscapeTiles = new();
     public Dictionary<Vector3, PlayingPieceTile> PlayingPieceTiles = new();
     public int LastId = 0;
-    public List<TileInfo> TileInfos;
+    public List<LandscapeTileInfo> LandscapeTileInfos;
+    public List<PlayingPieceTileInfo> PlayingPieceTileInfos;
     public List<Tile> TilesForMovement;
 
     public Tile Base;
@@ -37,7 +39,8 @@ public class GameTiles : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            Instance.TileInfos = GetLandscapeTileInfos();
+            Instance.LandscapeTileInfos = GetLandscapeTileInfos();
+            Instance.PlayingPieceTileInfos = GetPlayingPieceTileInfos();
             Instance.TilesForMovement = GetLandscapeTilesForMovement();
         }
         else if (Instance != this)
@@ -46,19 +49,30 @@ public class GameTiles : MonoBehaviour
         }
     }
 
-    public List<TileInfo> GetLandscapeTileInfos()
+    public List<PlayingPieceTileInfo> GetPlayingPieceTileInfos()
     {
-        return new List<TileInfo>
+        return new List<PlayingPieceTileInfo>
         {
-            new TileInfo(Grass,         1.0f,   10),
-            new TileInfo(LeafForest,    0.5f,   20),
-            new TileInfo(Desert,        0.5f,   30),
-            new TileInfo(Jungle,        0.5f,   30),
-            new TileInfo(Mountain,      0.4f,   100),
-            new TileInfo(Ocean,         0.4f,   100),
-            new TileInfo(Base,          0.2f,   10),
-            new TileInfo(PineForest,    0.2f,   20),
-            new TileInfo(Volcano,       0.05f,  100)
+            new PlayingPieceTileInfo(PlayingPieceTileType.Artillery, 5, 0, 1),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Cavalry,   3, 1, 4),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Infantry,  2, 3, 2),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Medic,     1, 1, 3),
+        };
+    }
+
+    public List<LandscapeTileInfo> GetLandscapeTileInfos()
+    {
+        return new List<LandscapeTileInfo>
+        {
+            new LandscapeTileInfo(Grass,         1.0f,   10),
+            new LandscapeTileInfo(LeafForest,    0.5f,   20),
+            new LandscapeTileInfo(Desert,        0.5f,   30),
+            new LandscapeTileInfo(Jungle,        0.5f,   30),
+            new LandscapeTileInfo(Mountain,      0.4f,   100),
+            new LandscapeTileInfo(Ocean,         0.4f,   100),
+            new LandscapeTileInfo(Base,          0.2f,   10),
+            new LandscapeTileInfo(PineForest,    0.2f,   20),
+            new LandscapeTileInfo(Volcano,       0.05f,  100)
         };
     }
 
@@ -124,7 +138,7 @@ public class GameTiles : MonoBehaviour
     public GameTile Add(
         GameTile.TileType type, 
         Vector3Int boardPosition, 
-        TileInfo tile, 
+        LandscapeTileInfo tile, 
         Tilemap tilemap,
         Player player, 
         PlayingPieceTile.PlayingPieceTileType playingPieceType = PlayingPieceTile.PlayingPieceTileType.None, 

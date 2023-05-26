@@ -8,6 +8,7 @@ using Random = UnityEngine.Random;
 using UnityEngine.UI;
 using TMPro;
 using Aoiti.Pathfinding;
+using static GameTiles;
 
 public class BoardController : MonoBehaviour
 {
@@ -416,18 +417,21 @@ public class BoardController : MonoBehaviour
             Tile tile = null;
             switch (playingPieceType)
             {
-                case PlayingPieceTile.PlayingPieceTileType.Infantry:
-                    tile = ActivePlayer.InfantryTile;
-                    break;
                 case PlayingPieceTile.PlayingPieceTileType.Artillery:
                     tile = ActivePlayer.ArtilleryTile;
+                    break;
+                case PlayingPieceTile.PlayingPieceTileType.Cavalry:
+                    tile = ActivePlayer.CavalryTile;
+                    break;
+                case PlayingPieceTile.PlayingPieceTileType.Infantry:
+                    tile = ActivePlayer.InfantryTile;
                     break;
                 case PlayingPieceTile.PlayingPieceTileType.Medic:
                     tile = ActivePlayer.MedicTile;
                     break;
             }
             ActivePlayer.SpawnsLeft--;
-            var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, new TileInfo(tile, 1, 0), TilemapPlayingPieces, ActivePlayer, playingPieceType);
+            var tileInfo = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, new LandscapeTileInfo(tile, 1, 0), TilemapPlayingPieces, ActivePlayer, playingPieceType);
             SelectPlayingPiece(tileInfo as PlayingPieceTile);
             Destroy(selectUnitTypeBox);
         });
