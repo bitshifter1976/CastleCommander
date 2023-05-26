@@ -12,12 +12,13 @@ public class PlayingPieceTile : GameTile
         Medic = 3
     }
 
+    public PlayingPieceTileInfo Info;
     public PlayingPieceTileType PlayingPieceType;
-
     public Player Player;
 
-    public PlayingPieceTile(Vector3Int boardPosition, Tile tile, Tilemap tilemap, int id, Color color, PlayingPieceTileType type, Player player, bool movable, int movementCost) : base(boardPosition, tile, tilemap, id, color, TileType.PlayingPiece, movable, movementCost)
+    public PlayingPieceTile(Vector3Int boardPosition, PlayingPieceTileInfo tile, Tilemap tilemap, int id, Color color, PlayingPieceTileType type, Player player, bool movable, int movementCost) : base(boardPosition, tile.Tile, tilemap, id, color, TileType.PlayingPiece, movable, movementCost)
     {
+        Info = tile;
         PlayingPieceType = type;
         Player = player;
     }

@@ -10,25 +10,28 @@ public class MouseHandler : MonoBehaviour
     public Tilemap TilemapLandscape; 
     public Tilemap TilemapPlayingPieces;
 
-    public Tile SelectedLandscapeTile;
     public Tile MouseOverLandscapeTile;
-    public Tile SelectedPlayingPiece;
     public Tile MouseOverPlayingPiece;
+    public Tile LeftSelectedLandscapeTile;
+    public Tile LeftSelectedPlayingPiece;
+    public Tile RightSelectedLandscapeTile;
+    public Tile RightSelectedPlayingPiece;
 
-    public Vector3Int SelectedLandscapeTilePosition;
     public Vector3Int MouseOverLandscapeTilePosition;
-    public Vector3Int SelectedPlayingPiecePosition;
     public Vector3Int MouseOverPlayingPiecePosition;
+    public Vector3Int LeftSelectedLandscapeTilePosition;
+    public Vector3Int LeftSelectedPlayingPiecePosition;
+    public Vector3Int RightSelectedLandscapeTilePosition;
+    public Vector3Int RightSelectedPlayingPiecePosition;
 
-    public EventHandler OnClick;
+    public EventHandler OnLeftClick;
+    public EventHandler OnRightClick;
 
     private void Update()
     {
         var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
         MouseOverPlayingPiecePosition = TilemapPlayingPieces.WorldToCell(mousePos);
         MouseOverPlayingPiece = TilemapPlayingPieces.GetTile<Tile>(MouseOverPlayingPiecePosition);
-
         MouseOverLandscapeTilePosition = TilemapLandscape.WorldToCell(mousePos);
         MouseOverLandscapeTile = TilemapLandscape.GetTile<Tile>(MouseOverLandscapeTilePosition);
 
@@ -36,16 +39,31 @@ public class MouseHandler : MonoBehaviour
         {
             if (MouseOverPlayingPiece != null)
             {
-                SelectedPlayingPiecePosition = MouseOverPlayingPiecePosition;
-                SelectedPlayingPiece = TilemapPlayingPieces.GetTile<Tile>(SelectedPlayingPiecePosition);
+                LeftSelectedPlayingPiecePosition = MouseOverPlayingPiecePosition;
+                LeftSelectedPlayingPiece = TilemapPlayingPieces.GetTile<Tile>(LeftSelectedPlayingPiecePosition);
             }
             if (MouseOverLandscapeTile != null)
             {
-                SelectedLandscapeTilePosition = MouseOverLandscapeTilePosition;
-                SelectedLandscapeTile = TilemapLandscape.GetTile<Tile>(SelectedLandscapeTilePosition);
+                LeftSelectedLandscapeTilePosition = MouseOverLandscapeTilePosition;
+                LeftSelectedLandscapeTile = TilemapLandscape.GetTile<Tile>(LeftSelectedLandscapeTilePosition);
             }
-            if (OnClick != null)
-                OnClick(this, new EventArgs());
+            if (OnLeftClick != null)
+                OnLeftClick(this, new EventArgs());
+        }
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (MouseOverPlayingPiece != null)
+            {
+                RightSelectedLandscapeTilePosition = MouseOverPlayingPiecePosition;
+                RightSelectedPlayingPiece = TilemapPlayingPieces.GetTile<Tile>(RightSelectedPlayingPiecePosition);
+            }
+            if (MouseOverLandscapeTile != null)
+            {
+                RightSelectedLandscapeTilePosition = MouseOverLandscapeTilePosition;
+                RightSelectedLandscapeTile = TilemapLandscape.GetTile<Tile>(RightSelectedLandscapeTilePosition);
+            }
+            if (OnRightClick != null)
+                OnRightClick(this, new EventArgs());
         }
     }
 }
