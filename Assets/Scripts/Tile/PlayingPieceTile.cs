@@ -16,9 +16,9 @@ public class PlayingPieceTile : GameTile
     public PlayingPieceTileType PlayingPieceType;
     public Player Player;
 
-    public PlayingPieceTile(Vector3Int boardPosition, PlayingPieceTileInfo tile, Tilemap tilemap, int id, Color color, PlayingPieceTileType type, Player player, bool movable, int movementCost) : base(boardPosition, tile.Tile, tilemap, id, color, TileType.PlayingPiece, movable, movementCost)
+    public PlayingPieceTile(Vector3Int boardPosition, Tile tile, PlayingPieceTileInfo tileInfo, Tilemap tilemap, int id, Color color, PlayingPieceTileType type, Player player, bool movable, int movementCost) : base(boardPosition, tile, tilemap, id, color, TileType.PlayingPiece, movable, movementCost)
     {
-        Info = tile;
+        Info = tileInfo;
         PlayingPieceType = type;
         Player = player;
     }

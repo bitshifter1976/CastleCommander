@@ -17,15 +17,13 @@ public class LandscapeTileInfo
 
 public class PlayingPieceTileInfo
 {
-    public Tile Tile;
     public PlayingPieceTileType PlayingPieceType;
     public int Attack;
     public int Defense;
     public int Speed;
 
-    public PlayingPieceTileInfo(Tile tile, PlayingPieceTileType tileType, int attack, int defense, int speed)
+    public PlayingPieceTileInfo(PlayingPieceTileType tileType, int attack, int defense, int speed)
     {
-        Tile = tile;
         PlayingPieceType = tileType;
         Attack = attack;
         Defense = defense;

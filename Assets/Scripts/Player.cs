@@ -13,7 +13,6 @@ public class Player : MonoBehaviour
     public Tile MedicTile;
     public int PointsLeft;
     public int SpawnsLeft;
-    public int UnitCount;
-    public int UnitDeadCount;
     public bool Active;
+    public int Distance;
 }

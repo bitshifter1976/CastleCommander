@@ -133,7 +133,7 @@ public class BoardController : MonoBehaviour
         ActivePlayer = Player1;
         Player1.Active = true;
         Player2.Active = false;
-        pathfinder = new Pathfinder<Vector3Int>(DistanceFunc, ConnectionsAndCosts);
+        pathfinder = new Pathfinder<Vector3Int>(GetDistance, ConnectionsAndCosts);
         ButtonReload.onClick.AddListener(OnReloadClick);
         ButtonShowUnitTypeInfo.onClick.AddListener(OnShowUnitTypeInfo);
         ButtonHideUnitTypeInfo.onClick.AddListener(OnHideUnitTypeInfo);
@@ -266,13 +266,10 @@ public class BoardController : MonoBehaviour
         TilemapUnderTiles.ClearAllTiles();
         Player1.PointsLeft = 0;
         Player1.SpawnsLeft = 10;
-        Player1.UnitCount = 0;
-        Player1.UnitDeadCount = 0;
+        Player1.Distance = 0;
         Player2.PointsLeft = 0;
         Player2.SpawnsLeft = 10;
-        Player2.UnitCount = 0;
-        Player2.UnitDeadCount = 0;
-        ActivePlayer = Player1;
+        Player2.Distance = 0;
         CreateBoard();
     }
 
@@ -293,7 +290,7 @@ public class BoardController : MonoBehaviour
                     var position = new Vector3Int(x, y, 0);
                     tilesLandscape.Add(position, landscapeTile);
                     tilesUnderTiles.Add(position, landscapeTile == GameTiles.Instance.Ocean ? GameTiles.Instance.UnderOcean : GameTiles.Instance.UnderDirt);
-                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == landscapeTile), null, TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GameTiles.Instance.GetLandscapeType(landscapeTile));
+                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, landscapeTile, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == landscapeTile), null, TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GameTiles.Instance.GetLandscapeType(landscapeTile));
                 }
             }
             // add player castle tiles
@@ -307,8 +304,8 @@ public class BoardController : MonoBehaviour
             tilesUnderTiles[pos1] = GameTiles.Instance.UnderDirt;
             tilesLandscape[pos2] = GameTiles.Instance.Castle2;
             tilesUnderTiles[pos2] = GameTiles.Instance.UnderDirt;
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == GameTiles.Instance.Base), null, TilemapLandscape, Player1);
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == GameTiles.Instance.Base), null, TilemapLandscape, Player2);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GameTiles.Instance.Castle1, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == GameTiles.Instance.Base), null, TilemapLandscape, Player1);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GameTiles.Instance.Castle2, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == GameTiles.Instance.Base), null, TilemapLandscape, Player2);
         }
     }
 
@@ -486,8 +483,7 @@ public class BoardController : MonoBehaviour
             }
             ActivePlayer.SpawnsLeft--;
             var tileInfo = GameTiles.Instance.PlayingPieceTileInfos.First(i => i.PlayingPieceType == playingPieceType);
-            tileInfo.Tile = tile;
-            var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, null, tileInfo, TilemapPlayingPieces, ActivePlayer, playingPieceType);
+            var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, TilemapPlayingPieces, ActivePlayer, playingPieceType);
             SelectPlayingPiece(tile2 as PlayingPieceTile);
             Destroy(selectUnitTypeBox);
         }));
@@ -557,7 +553,7 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private float DistanceFunc(Vector3Int a, Vector3Int b)
+    private float GetDistance(Vector3Int a, Vector3Int b)
     {
         return (a - b).sqrMagnitude;
     }
