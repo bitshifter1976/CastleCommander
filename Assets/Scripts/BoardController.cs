@@ -420,38 +420,33 @@ public class BoardController : MonoBehaviour
         {
             var attacker = formerLeftSelectedPlayingPiece;
             var defender = rightSelectedPlayingPiece;
+            ActivePlayer.Distance = (int)Math.Round(GetDistance(attacker.BoardPosition, defender.BoardPosition));
             switch (attacker.PlayingPieceType)
             {
                 case PlayingPieceTile.PlayingPieceTileType.Artillery:
-                    // if in movement range, do range attack
-                    if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId)
-                    {
-
-                    }
-                    break;
                 case PlayingPieceTile.PlayingPieceTileType.Cavalry:
-                    // if attacker next to defender, do attack
-                    if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId)
-                    {
-
-                    }
-                    break;
                 case PlayingPieceTile.PlayingPieceTileType.Infantry:
-                    // if attacker next to defender, do attack
-                    if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId)
-                    {
-
-                    }
+                    // if defender in attack range, do attack
+                    if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                        ShowFightBoard(attacker, defender, ActivePlayer.Distance > 1);
                     break;
                 case PlayingPieceTile.PlayingPieceTileType.Medic:
                     // if attacker next to defender, do healing
-                    if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId == ActivePlayer.PlayerId)
-                    {
-
-                    }
+                    if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId == ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                        HealPlayingPiece(attacker, defender);
                     break;
             }
         }
+    }
+
+    private void HealPlayingPiece(PlayingPieceTile attacker, PlayingPieceTile defender)
+    {
+        defender.Info.Energy = PlayingPieceTileInfo.MaxEnergy;
+    }
+
+    private void ShowFightBoard(PlayingPieceTile attacker, PlayingPieceTile defender, bool rangedAttack)
+    {
+        throw new NotImplementedException();
     }
 
     private void PlacePlayingPiece(Vector3Int position)

@@ -53,10 +53,10 @@ public class GameTiles : MonoBehaviour
     {
         return new List<PlayingPieceTileInfo>
         {
-            new PlayingPieceTileInfo(PlayingPieceTileType.Artillery, 5, 0, 1),
-            new PlayingPieceTileInfo(PlayingPieceTileType.Cavalry,   3, 1, 4),
-            new PlayingPieceTileInfo(PlayingPieceTileType.Infantry,  2, 3, 2),
-            new PlayingPieceTileInfo(PlayingPieceTileType.Medic,     1, 1, 3),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Artillery, 5, 0, 1, 30),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Cavalry,   3, 1, 4, 5),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Infantry,  2, 3, 2, 1),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Medic,     1, 1, 3, 1),
         };
     }
 

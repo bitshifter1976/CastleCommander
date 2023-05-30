@@ -54,7 +54,7 @@ public class MouseHandler : MonoBehaviour
         {
             if (MouseOverPlayingPiece != null)
             {
-                RightSelectedLandscapeTilePosition = MouseOverPlayingPiecePosition;
+                RightSelectedPlayingPiecePosition = MouseOverPlayingPiecePosition;
                 RightSelectedPlayingPiece = TilemapPlayingPieces.GetTile<Tile>(RightSelectedPlayingPiecePosition);
             }
             if (MouseOverLandscapeTile != null)

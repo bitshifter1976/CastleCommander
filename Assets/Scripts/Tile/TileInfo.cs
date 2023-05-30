@@ -21,12 +21,17 @@ public class PlayingPieceTileInfo
     public int Attack;
     public int Defense;
     public int Speed;
+    public int DistanceForAttack;
+    public int Energy;
+    public static readonly int MaxEnergy = 10;
 
-    public PlayingPieceTileInfo(PlayingPieceTileType tileType, int attack, int defense, int speed)
+    public PlayingPieceTileInfo(PlayingPieceTileType tileType, int attack, int defense, int speed, int distanceForAttack)
     {
         PlayingPieceType = tileType;
         Attack = attack;
         Defense = defense;
         Speed = speed;
+        DistanceForAttack = distanceForAttack;
+        Energy = MaxEnergy;
     }
 }
