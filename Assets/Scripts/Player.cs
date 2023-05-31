@@ -14,5 +14,5 @@ public class Player : MonoBehaviour
     public int PointsLeft;
     public int SpawnsLeft;
     public bool Active;
-    public int Distance;
+    public float Distance;
 }

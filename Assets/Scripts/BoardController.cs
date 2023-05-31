@@ -79,7 +79,6 @@ public class BoardController : MonoBehaviour
     public BoardState State = BoardState.Load;
     [Header("Playing piece movement")]
     public List<Vector3Int> MovementPath;
-    public List<Vector3Int> FightingPath;
     public Vector3Int[] MovementDirectionsOdd  = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
     public Vector3Int[] MovementDirectionsEven = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(-1, 1, 0)/*top-left*/, new Vector3Int(0, 1, 0)/*top-right*/, new Vector3Int(-1, -1, 0)/*bottom-left*/, new Vector3Int(0, -1, 0)/*bottom-right*/ };
 
@@ -353,6 +352,7 @@ public class BoardController : MonoBehaviour
         TilemapPath.ClearAllTiles();
         if (formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
         {
+            ActivePlayer.Distance = GetDistance(formerLeftSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition);
             pathfinder.GenerateAstarPath(formerLeftSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition, out var path);
             var costs = 0f;
             var movementPossible = true;
@@ -374,7 +374,6 @@ public class BoardController : MonoBehaviour
                 TilemapPath.SetTile(position, pathTile);
             }
             MovementPath = movementPossible ? path : null;
-            FightingPath = path;
         }
     }
 
@@ -420,7 +419,7 @@ public class BoardController : MonoBehaviour
         {
             var attacker = formerLeftSelectedPlayingPiece;
             var defender = rightSelectedPlayingPiece;
-            ActivePlayer.Distance = (int)Math.Round(GetDistance(attacker.BoardPosition, defender.BoardPosition));
+            ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
             switch (attacker.PlayingPieceType)
             {
                 case PlayingPieceTile.PlayingPieceTileType.Artillery:
