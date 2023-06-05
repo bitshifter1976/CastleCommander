@@ -9,7 +9,7 @@ using UnityEngine.UI;
 using TMPro;
 using Aoiti.Pathfinding;
 using static GameTiles;
-public class BoardController : MonoBehaviour
+public class Board : MonoBehaviour
 {
     #region Definitions
     public enum BoardMode 
@@ -64,6 +64,7 @@ public class BoardController : MonoBehaviour
     public TextMeshProUGUI MessageBoxButtonCancelText;
     public GameObject SelectUnitTypePrefab;
     public GameObject UnitTypeInfo;
+    public FightBoard FightBoard;
     [Header("Dices")]
     public List<Dice> Dices;
     [Header("Timeouts")]
@@ -93,6 +94,7 @@ public class BoardController : MonoBehaviour
     private Pathfinder<Vector3Int> pathfinder;
     private GameObject selectUnitTypeBox;
     private TMP_Dropdown selectUnitTypeDropdown;
+    private bool showFightBoard;
     #endregion
 
     private void ShowMessageBox(string message, string buttonTextOk = "ok", string buttonTextCancel = null, BoardState? stateToTriggerOnOk = null, BoardState? stateToTriggerOnCancel = null)
@@ -129,6 +131,7 @@ public class BoardController : MonoBehaviour
     private void Start()
     {
         MessageBox.SetActive(false);
+        showFightBoard = false;
         ActivePlayer = Player1;
         Player1.Active = true;
         Player2.Active = false;
@@ -233,8 +236,21 @@ public class BoardController : MonoBehaviour
             case BoardState.PlayRound:
                 {
                     ShowPath();
-                    if (Timer.IsOver() || ActivePlayer.PointsLeft <= 0)
+                    if (showFightBoard && FightBoard.State == FightBoard.FightBoardState.Hidden)
+                    {
+                        Timer.Pause();
+                        FightBoard.Show();                        
+                    }
+                    else if (showFightBoard && FightBoard.State == FightBoard.FightBoardState.Close)
+                    {
+                        FightBoard.Hide();
+                        Timer.Continue();
+                        showFightBoard = false;
+                    }
+                    else if (Timer.IsOver() || ActivePlayer.PointsLeft <= 0)
+                    {
                         State = BoardState.FinishRound;
+                    }
                     break;
                 }
             case BoardState.FinishRound:
@@ -445,7 +461,7 @@ public class BoardController : MonoBehaviour
 
     private void ShowFightBoard(PlayingPieceTile attacker, PlayingPieceTile defender, bool rangedAttack)
     {
-        throw new NotImplementedException();
+        showFightBoard = true;
     }
 
     private void PlacePlayingPiece(Vector3Int position)

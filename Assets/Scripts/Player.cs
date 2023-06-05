@@ -15,4 +15,5 @@ public class Player : MonoBehaviour
     public int SpawnsLeft;
     public bool Active;
     public float Distance;
+    public bool IsAttacker;
 }

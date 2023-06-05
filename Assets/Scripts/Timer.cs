@@ -42,4 +42,14 @@ public class Timer : MonoBehaviour
     {
         return timeElapsedSec >= timeToEndRoundSec;
     }
+
+    public void Pause()
+    {
+        isRunning = false;
+    }
+
+    public void Continue()
+    {
+        isRunning = true;
+    }
 }
