@@ -16,6 +16,7 @@ public class GameTiles : MonoBehaviour
     public int LastId = 0;
     public List<LandscapeTileInfo> LandscapeTileInfos;
     public List<PlayingPieceTileInfo> PlayingPieceTileInfos;
+    public CastleTileInfo CastleTileInfo;
     public List<Tile> TilesForMovement;
 
     public Tile Base;
@@ -41,6 +42,7 @@ public class GameTiles : MonoBehaviour
             Instance = this;
             Instance.LandscapeTileInfos = GetLandscapeTileInfos();
             Instance.PlayingPieceTileInfos = GetPlayingPieceTileInfos();
+            Instance.CastleTileInfo = GetCastleTileInfo();
             Instance.TilesForMovement = GetLandscapeTilesForMovement();
         }
         else if (Instance != this)
@@ -55,9 +57,14 @@ public class GameTiles : MonoBehaviour
         {
             new PlayingPieceTileInfo(PlayingPieceTileType.Artillery, 5, 0, 1, 30),
             new PlayingPieceTileInfo(PlayingPieceTileType.Cavalry,   3, 1, 4, 5),
-            new PlayingPieceTileInfo(PlayingPieceTileType.Infantry,  2, 3, 2, 1),
-            new PlayingPieceTileInfo(PlayingPieceTileType.Medic,     1, 1, 3, 1),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Infantry,  2, 3, 2, 2),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Medic,     1, 1, 3, 2),
         };
+    }
+
+    private CastleTileInfo GetCastleTileInfo()
+    {
+        return new CastleTileInfo(5, 5, 1);
     }
 
     public List<LandscapeTileInfo> GetLandscapeTileInfos()
@@ -141,6 +148,7 @@ public class GameTiles : MonoBehaviour
         Tile tile,
         LandscapeTileInfo tileInfo,
         PlayingPieceTileInfo tileInfo2,
+        CastleTileInfo tileInfo3,
         Tilemap tilemap,
         Player player, 
         PlayingPieceTile.PlayingPieceTileType playingPieceType = PlayingPieceTile.PlayingPieceTileType.None, 
@@ -150,9 +158,9 @@ public class GameTiles : MonoBehaviour
         {
             case GameTile.TileType.Castle:
                 if (CastleTiles.ContainsKey(boardPosition))
-                    CastleTiles[boardPosition] = new CastleTile(boardPosition, tile, tilemap, CastleTiles[boardPosition].Id, tileInfo.Tile.color, player, true, tileInfo.MovementCosts);
+                    CastleTiles[boardPosition] = new CastleTile(boardPosition, tile, tileInfo3, tilemap, CastleTiles[boardPosition].Id, tileInfo.Tile.color, player, true, tileInfo.MovementCosts);
                 else
-                    CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tilemap, NewId(), tileInfo.Tile.color, player, true, tileInfo.MovementCosts));
+                    CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tileInfo3, tilemap, NewId(), tileInfo.Tile.color, player, true, tileInfo.MovementCosts));
                 return CastleTiles[boardPosition];
             case GameTile.TileType.Landscape:
                 if (LandscapeTiles.ContainsKey(boardPosition))

@@ -4,9 +4,13 @@ using UnityEngine.Tilemaps;
 public class CastleTile : GameTile
 {
     public Player Player;
+    public CastleTileInfo Info;
 
-    public CastleTile(Vector3Int boardPosition, Tile tile, Tilemap tilemap, int id, Color color, Player player, bool movable, int movementCost) : base(boardPosition, tile, tilemap, id, color, TileType.PlayingPiece, movable, movementCost)
+    private int MaxEnergy = 30;
+
+    public CastleTile(Vector3Int boardPosition, Tile tile, CastleTileInfo info, Tilemap tilemap, int id, Color color, Player player, bool movable, int movementCost) : base(boardPosition, tile, tilemap, id, color, TileType.PlayingPiece, movable, movementCost)
     {
         Player = player;
+        Info = info;
     }
 }

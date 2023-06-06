@@ -78,6 +78,7 @@ public class Board : MonoBehaviour
     [Header("General")]
     public Player ActivePlayer;
     public BoardState State = BoardState.Load;
+    public int PointsForAttack = 5;
     [Header("Playing piece movement")]
     public List<Vector3Int> MovementPath;
     public Vector3Int[] MovementDirectionsOdd  = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
@@ -86,10 +87,6 @@ public class Board : MonoBehaviour
     private readonly Dictionary<Vector3Int, Tile> tilesLandscape = new();
     private readonly Dictionary<Vector3Int, Tile> tilesUnderTiles = new();
     private float timeElapsed = 0f;
-    private LandscapeTile leftSelectedLandscapeTile;
-    private CastleTile leftSelectedCastle;
-    private PlayingPieceTile leftSelectedPlayingPiece;
-    private PlayingPieceTile rightSelectedPlayingPiece;
     private PlayingPieceTile formerLeftSelectedPlayingPiece;
     private Pathfinder<Vector3Int> pathfinder;
     private GameObject selectUnitTypeBox;
@@ -305,7 +302,7 @@ public class Board : MonoBehaviour
                     var position = new Vector3Int(x, y, 0);
                     tilesLandscape.Add(position, landscapeTile);
                     tilesUnderTiles.Add(position, landscapeTile == GameTiles.Instance.Ocean ? GameTiles.Instance.UnderOcean : GameTiles.Instance.UnderDirt);
-                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, landscapeTile, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == landscapeTile), null, TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GameTiles.Instance.GetLandscapeType(landscapeTile));
+                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, landscapeTile, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == landscapeTile), null, null, TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GameTiles.Instance.GetLandscapeType(landscapeTile));
                 }
             }
             // add player castle tiles
@@ -319,8 +316,8 @@ public class Board : MonoBehaviour
             tilesUnderTiles[pos1] = GameTiles.Instance.UnderDirt;
             tilesLandscape[pos2] = GameTiles.Instance.Castle2;
             tilesUnderTiles[pos2] = GameTiles.Instance.UnderDirt;
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GameTiles.Instance.Castle1, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == GameTiles.Instance.Base), null, TilemapLandscape, Player1);
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GameTiles.Instance.Castle2, GameTiles.Instance.GetLandscapeTileInfos().First(ti => ti.Tile == GameTiles.Instance.Base), null, TilemapLandscape, Player2);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GameTiles.Instance.Castle1, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == GameTiles.Instance.Base), null, GameTiles.Instance.CastleTileInfo, TilemapLandscape, Player1);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GameTiles.Instance.Castle2, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == GameTiles.Instance.Base), null, GameTiles.Instance.CastleTileInfo, TilemapLandscape, Player2);
         }
     }
 
@@ -405,9 +402,9 @@ public class Board : MonoBehaviour
             return;
 
         // get selected game tiles
-        leftSelectedLandscapeTile = GameTiles.Instance.Get<LandscapeTile>(MouseHandler.LeftSelectedLandscapeTilePosition);
-        leftSelectedCastle = GameTiles.Instance.Get<CastleTile>(MouseHandler.LeftSelectedLandscapeTilePosition);
-        leftSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.LeftSelectedPlayingPiecePosition);
+        var leftSelectedLandscapeTile = GameTiles.Instance.Get<LandscapeTile>(MouseHandler.LeftSelectedLandscapeTilePosition);
+        var leftSelectedCastle = GameTiles.Instance.Get<CastleTile>(MouseHandler.LeftSelectedLandscapeTilePosition);
+        var leftSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.LeftSelectedPlayingPiecePosition);
         var tileToMoveToHasPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.LeftSelectedLandscapeTilePosition) != null;
         // if not prior selected playing piece, select it for movement
         if (formerLeftSelectedPlayingPiece == null && leftSelectedPlayingPiece != null && leftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
@@ -429,10 +426,12 @@ public class Board : MonoBehaviour
             return;
 
         // get selected game tiles
-        rightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.RightSelectedPlayingPiecePosition);
+        var rightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.RightSelectedPlayingPiecePosition);
+        var rightSelectedCaste = GameTiles.Instance.Get<CastleTile>(MouseHandler.RightSelectedLandscapeTilePosition);
         // if prior left selected playing piece and right selected playing piece
-        if (formerLeftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null)
+        if (formerLeftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && ActivePlayer.PointsLeft >= PointsForAttack)
         {
+            ActivePlayer.PointsLeft -= PointsForAttack;
             var attacker = formerLeftSelectedPlayingPiece;
             var defender = rightSelectedPlayingPiece;
             ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
@@ -443,7 +442,7 @@ public class Board : MonoBehaviour
                 case PlayingPieceTile.PlayingPieceTileType.Infantry:
                     // if defender in attack range, do attack
                     if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
-                        ShowFightBoard(attacker, defender, ActivePlayer.Distance > 1);
+                        ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
                     break;
                 case PlayingPieceTile.PlayingPieceTileType.Medic:
                     // if attacker next to defender, do healing
@@ -452,6 +451,14 @@ public class Board : MonoBehaviour
                     break;
             }
         }
+        else if (formerLeftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= PointsForAttack)
+        {
+            var attacker = formerLeftSelectedPlayingPiece;
+            var defender = rightSelectedCaste;
+            ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
+            //if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                //ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
+        }
     }
 
     private void HealPlayingPiece(PlayingPieceTile attacker, PlayingPieceTile defender)
@@ -459,8 +466,15 @@ public class Board : MonoBehaviour
         defender.Info.Energy = PlayingPieceTileInfo.MaxEnergy;
     }
 
-    private void ShowFightBoard(PlayingPieceTile attacker, PlayingPieceTile defender, bool rangedAttack)
+    private void ShowFightBoard(GameTile attacker, GameTile defender, bool rangedAttack)
     {
+        if (attacker is PlayingPieceTile a && defender is PlayingPieceTile d)
+        {
+            FightBoard.Tile1 = a.Player.PlayerId == 1 ? attacker : defender;
+            FightBoard.Tile2 = a.Player.PlayerId == 2 ? attacker : defender;
+            a.Info.IsAttacker = a.Player.PlayerId == 1;
+            a.Info.IsAttacker = a.Player.PlayerId == 2;
+        }
         showFightBoard = true;
     }
 
@@ -493,7 +507,7 @@ public class Board : MonoBehaviour
             }
             ActivePlayer.SpawnsLeft--;
             var tileInfo = GameTiles.Instance.PlayingPieceTileInfos.First(i => i.PlayingPieceType == playingPieceType);
-            var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, TilemapPlayingPieces, ActivePlayer, playingPieceType);
+            var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, null, TilemapPlayingPieces, ActivePlayer, playingPieceType);
             SelectPlayingPiece(tile2 as PlayingPieceTile);
             Destroy(selectUnitTypeBox);
         }));
