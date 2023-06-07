@@ -11203,7 +11203,7 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {r: 3.4155e-41, g: 3.4155e-41, b: 3.4155e-41, a: 3.4155e-41}
   - m_RefCount: 0
-    m_Data: {r: 3.459e-41, g: 3.459e-41, b: 3.459e-41, a: 3.459e-41}
+    m_Data: {r: 3.4618e-41, g: 3.4618e-41, b: 3.4618e-41, a: 3.4618e-41}
   - m_RefCount: 4
     m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
@@ -13018,7 +13018,7 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {r: 3.4242e-41, g: 3.4242e-41, b: 3.4242e-41, a: 3.4242e-41}
   - m_RefCount: 0
-    m_Data: {r: 3.4766e-41, g: 3.4766e-41, b: 3.4766e-41, a: 3.4766e-41}
+    m_Data: {r: 3.4808e-41, g: 3.4808e-41, b: 3.4808e-41, a: 3.4808e-41}
   - m_RefCount: 4
     m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
