@@ -13,6 +13,11 @@ public class LandscapeTileInfo
         Probability = probability;
         MovementCosts = movementCosts;
     }
+
+    public LandscapeTileInfo Clone()
+    {
+        return new LandscapeTileInfo(Tile, Probability, MovementCosts);
+    }
 }
 
 public class PlayingPieceTileInfo
@@ -23,6 +28,7 @@ public class PlayingPieceTileInfo
     public int Speed;
     public int DistanceForAttack;
     public int Energy;
+    public int PointsForAttack = 10;
     public bool IsAttacker;
     public static readonly int MaxEnergy = 10;
 
@@ -34,6 +40,11 @@ public class PlayingPieceTileInfo
         Speed = speed;
         DistanceForAttack = distanceForAttack;
         Energy = MaxEnergy;
+    }
+
+    public PlayingPieceTileInfo Clone()
+    {
+        return new PlayingPieceTileInfo(PlayingPieceType, Attack, Defense, Speed, DistanceForAttack);
     }
 }
 
@@ -51,5 +62,10 @@ public class CastleTileInfo
         Defense = defense;
         Speed = speed;
         Energy = MaxEnergy;
+    }
+
+    public CastleTileInfo Clone()
+    {
+        return new CastleTileInfo(Attack, Defense, Speed);
     }
 }

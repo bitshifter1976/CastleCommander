@@ -90,6 +90,17 @@ public class FightBoard : MonoBehaviour
                         Text25.text = t2.Info.Speed.ToString();
                         Text26.text = t2.Info.DistanceForAttack.ToString();
                     }
+                    else if (Tile2 != null && Tile2 is CastleTile c && c.Info != null)
+                    {
+                        Heading2.text = $"player {c.Player.PlayerId} (defend)";
+                        Text21.text = "castle";
+                        Text22.text = c.Info.Energy.ToString();
+                        Text23.text = c.Info.Attack.ToString();
+                        Text24.text = c.Info.Defense.ToString();
+                        Text25.text = c.Info.Speed.ToString();
+                        Text26.text = "0";
+                    }
+                    Result.text = string.Empty;
                     Dice1.Roll();
                     Dice2.Roll();
                     SoundPlayer.Instance.Play("DicesRolling");
@@ -117,10 +128,10 @@ public class FightBoard : MonoBehaviour
                     }
                     if (Tile1 is PlayingPieceTile t3 && !t3.Info.IsAttacker && Tile2 is PlayingPieceTile t4)
                     {
-                        var attack = Dice1.Result + t3.Info.Attack;
-                        var defense = Dice2.Result + t4.Info.Defense;
-                        Result.text = $"Attack: {Dice1.Result} + {t3.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
-                        Result.text += $"Defense: {Dice2.Result} + {t4.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
+                        var attack = Dice2.Result + t4.Info.Attack;
+                        var defense = Dice1.Result + t3.Info.Defense;
+                        Result.text = $"Attack: {Dice2.Result} + {t4.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
+                        Result.text += $"Defense: {Dice1.Result} + {t3.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
                         var damage = attack - defense;
                         if (damage < 0) damage = 0;
                         Result.text += $"Damage: {damage}";
@@ -129,9 +140,9 @@ public class FightBoard : MonoBehaviour
                     else if (Tile1 is PlayingPieceTile t5 && t5.Info.IsAttacker && Tile2 is CastleTile t6)
                     {
                         var attack = Dice1.Result + t5.Info.Attack;
-                        var defense = Dice1.Result + t6.Info.Attack;
-                        Result.text = $"Attack: {Dice2.Result} + {t5.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
-                        Result.text += $"Defense: {Dice1.Result} + {t5.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
+                        var defense = Dice2.Result + t6.Info.Attack;
+                        Result.text = $"Attack: {Dice1.Result} + {t5.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
+                        Result.text += $"Defense: {Dice2.Result} + {t6.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
                         var damage = attack - defense;
                         if (damage < 0) damage = 0;
                         Result.text += $"Damage: {damage}";

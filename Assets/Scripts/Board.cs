@@ -27,7 +27,8 @@ public class Board : MonoBehaviour
         RollDice,
         PlayRound,
         FinishRound,
-        GameEnd
+        GameEnd,
+        GameClose
     }
 
     #endregion
@@ -78,7 +79,6 @@ public class Board : MonoBehaviour
     [Header("General")]
     public Player ActivePlayer;
     public BoardState State = BoardState.Load;
-    public int PointsForAttack = 5;
     [Header("Playing piece movement")]
     public List<Vector3Int> MovementPath;
     public Vector3Int[] MovementDirectionsOdd  = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
@@ -92,6 +92,7 @@ public class Board : MonoBehaviour
     private GameObject selectUnitTypeBox;
     private TMP_Dropdown selectUnitTypeDropdown;
     private bool showFightBoard;
+    private bool movePlayingPiece;
     #endregion
 
     private void ShowMessageBox(string message, string buttonTextOk = "ok", string buttonTextCancel = null, BoardState? stateToTriggerOnOk = null, BoardState? stateToTriggerOnCancel = null)
@@ -232,21 +233,36 @@ public class Board : MonoBehaviour
                 }
             case BoardState.PlayRound:
                 {
-                    ShowPath();
-                    if (showFightBoard && FightBoard.State == FightBoard.FightBoardState.Hidden)
+                    if (showFightBoard)
                     {
-                        Timer.Pause();
-                        FightBoard.Show();                        
-                    }
-                    else if (showFightBoard && FightBoard.State == FightBoard.FightBoardState.Close)
-                    {
-                        FightBoard.Hide();
-                        Timer.Continue();
-                        showFightBoard = false;
+                        if (FightBoard.State == FightBoard.FightBoardState.Hidden)
+                        {
+                            Timer.Pause();
+                            FightBoard.Show();
+                        }
+                        else if (FightBoard.State == FightBoard.FightBoardState.Close)
+                        {
+                            showFightBoard = false;
+                            FightBoard.Hide();
+                            Timer.Continue();
+                            if (FightBoard.Tile1 is PlayingPieceTile t && !t.Info.IsAttacker && t.Info.Energy <= 0)
+                                t.Tilemap.SetTile(t.BoardPosition, null);
+                            if (FightBoard.Tile2 is PlayingPieceTile t2 && !t2.Info.IsAttacker && t2.Info.Energy <= 0)
+                                t2.Tilemap.SetTile(t2.BoardPosition, null);
+                            if (FightBoard.Tile2 is CastleTile c && c.Info.Energy <= 0)
+                            {
+                                c.Tilemap.SetTile(c.BoardPosition, null);
+                                State = BoardState.GameEnd;
+                            }
+                        }
                     }
                     else if (Timer.IsOver() || ActivePlayer.PointsLeft <= 0)
                     {
                         State = BoardState.FinishRound;
+                    }
+                    else
+                    {
+                        ShowPath();
                     }
                     break;
                 }
@@ -263,6 +279,12 @@ public class Board : MonoBehaviour
                 }
             case BoardState.GameEnd:
                 {
+                    ShowMessageBox($"player {ActivePlayer.PlayerId} won the game!{Environment.NewLine}do you want to load a new game?", "yes", "no", BoardState.Load, BoardState.GameClose);
+                    break;
+                }
+            case BoardState.GameClose:
+                {
+                    Application.Quit();
                     break;
                 }
         }
@@ -302,7 +324,7 @@ public class Board : MonoBehaviour
                     var position = new Vector3Int(x, y, 0);
                     tilesLandscape.Add(position, landscapeTile);
                     tilesUnderTiles.Add(position, landscapeTile == GameTiles.Instance.Ocean ? GameTiles.Instance.UnderOcean : GameTiles.Instance.UnderDirt);
-                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, landscapeTile, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == landscapeTile), null, null, TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GameTiles.Instance.GetLandscapeType(landscapeTile));
+                    GameTiles.Instance.Add(GameTile.TileType.Landscape, position, landscapeTile, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == landscapeTile).Clone(), null, null, TilemapLandscape, ActivePlayer, PlayingPieceTile.PlayingPieceTileType.None, GameTiles.Instance.GetLandscapeType(landscapeTile));
                 }
             }
             // add player castle tiles
@@ -316,8 +338,8 @@ public class Board : MonoBehaviour
             tilesUnderTiles[pos1] = GameTiles.Instance.UnderDirt;
             tilesLandscape[pos2] = GameTiles.Instance.Castle2;
             tilesUnderTiles[pos2] = GameTiles.Instance.UnderDirt;
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GameTiles.Instance.Castle1, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == GameTiles.Instance.Base), null, GameTiles.Instance.CastleTileInfo, TilemapLandscape, Player1);
-            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GameTiles.Instance.Castle2, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == GameTiles.Instance.Base), null, GameTiles.Instance.CastleTileInfo, TilemapLandscape, Player2);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos1, GameTiles.Instance.Castle1, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == GameTiles.Instance.Base).Clone(), null, GameTiles.Instance.CastleTileInfo.Clone(), TilemapLandscape, Player1);
+            GameTiles.Instance.Add(GameTile.TileType.Castle, pos2, GameTiles.Instance.Castle2, GameTiles.Instance.LandscapeTileInfos.First(ti => ti.Tile == GameTiles.Instance.Base).Clone(), null, GameTiles.Instance.CastleTileInfo.Clone(), TilemapLandscape, Player2);
         }
     }
 
@@ -363,7 +385,7 @@ public class Board : MonoBehaviour
     private void ShowPath()
     {
         TilemapPath.ClearAllTiles();
-        if (formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
+        if (formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && !movePlayingPiece)
         {
             ActivePlayer.Distance = GetDistance(formerLeftSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition);
             pathfinder.GenerateAstarPath(formerLeftSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition, out var path);
@@ -429,9 +451,9 @@ public class Board : MonoBehaviour
         var rightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.RightSelectedPlayingPiecePosition);
         var rightSelectedCaste = GameTiles.Instance.Get<CastleTile>(MouseHandler.RightSelectedLandscapeTilePosition);
         // if prior left selected playing piece and right selected playing piece
-        if (formerLeftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && ActivePlayer.PointsLeft >= PointsForAttack)
+        if (formerLeftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && ActivePlayer.PointsLeft >= formerLeftSelectedPlayingPiece.Info.PointsForAttack)
         {
-            ActivePlayer.PointsLeft -= PointsForAttack;
+            ActivePlayer.PointsLeft -= formerLeftSelectedPlayingPiece.Info.PointsForAttack;
             var attacker = formerLeftSelectedPlayingPiece;
             var defender = rightSelectedPlayingPiece;
             ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
@@ -451,13 +473,14 @@ public class Board : MonoBehaviour
                     break;
             }
         }
-        else if (formerLeftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= PointsForAttack)
+        else if (formerLeftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= formerLeftSelectedPlayingPiece.Info.PointsForAttack)
         {
+            ActivePlayer.PointsLeft -= formerLeftSelectedPlayingPiece.Info.PointsForAttack;
             var attacker = formerLeftSelectedPlayingPiece;
             var defender = rightSelectedCaste;
             ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
-            //if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
-                //ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
+            if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
         }
     }
 
@@ -470,10 +493,16 @@ public class Board : MonoBehaviour
     {
         if (attacker is PlayingPieceTile a && defender is PlayingPieceTile d)
         {
-            FightBoard.Tile1 = a.Player.PlayerId == 1 ? attacker : defender;
-            FightBoard.Tile2 = a.Player.PlayerId == 2 ? attacker : defender;
             a.Info.IsAttacker = a.Player.PlayerId == 1;
-            a.Info.IsAttacker = a.Player.PlayerId == 2;
+            d.Info.IsAttacker = a.Player.PlayerId == 2;
+            FightBoard.Tile1 = a.Player.PlayerId == 1 ? a : d;
+            FightBoard.Tile2 = a.Player.PlayerId == 2 ? a : d;
+        }
+        else if (attacker is PlayingPieceTile a2 && defender is CastleTile c)
+        {
+            a2.Info.IsAttacker = true;
+            FightBoard.Tile1 = a2;
+            FightBoard.Tile2 = c;
         }
         showFightBoard = true;
     }
@@ -506,7 +535,7 @@ public class Board : MonoBehaviour
                     break;
             }
             ActivePlayer.SpawnsLeft--;
-            var tileInfo = GameTiles.Instance.PlayingPieceTileInfos.First(i => i.PlayingPieceType == playingPieceType);
+            var tileInfo = GameTiles.Instance.PlayingPieceTileInfos.First(i => i.PlayingPieceType == playingPieceType).Clone();
             var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, null, TilemapPlayingPieces, ActivePlayer, playingPieceType);
             SelectPlayingPiece(tile2 as PlayingPieceTile);
             Destroy(selectUnitTypeBox);
@@ -544,6 +573,7 @@ public class Board : MonoBehaviour
     {
         if (MovementPath.Count > 0)
         {
+            movePlayingPiece = true;
             StopAllCoroutines();
             StartCoroutine(MoveFormerSelectedPlayingPiece());
         }
@@ -574,6 +604,7 @@ public class Board : MonoBehaviour
             }
             // calculate points for movement
             ActivePlayer.PointsLeft -= (int)Math.Round(costs);
+            movePlayingPiece = false;
         }
     }
 
