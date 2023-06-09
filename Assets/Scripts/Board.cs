@@ -495,11 +495,13 @@ public class Board : MonoBehaviour
 
     private void HealPlayingPiece(PlayingPieceTile attacker, PlayingPieceTile defender)
     {
+        SoundPlayer.Instance.Play("Heal");
         defender.Info.Energy = PlayingPieceTileInfo.MaxEnergy;
     }
 
     private void ShowFightBoard(GameTile attacker, GameTile defender, bool rangedAttack)
     {
+        SoundPlayer.Instance.Play(rangedAttack ? "RangedAttack" : "Attack");
         if (attacker is PlayingPieceTile a && defender is PlayingPieceTile d)
         {
             a.Info.IsAttacker = a.Player.PlayerId == 1;
@@ -520,7 +522,8 @@ public class Board : MonoBehaviour
     {
         if (selectUnitTypeBox != null)
             return;
-        
+
+        SoundPlayer.Instance.Play("Select");
         selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
         selectUnitTypeBox.transform.SetParent(Hud.transform, false);
         selectUnitTypeDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
@@ -553,6 +556,7 @@ public class Board : MonoBehaviour
 
     private void SelectPlayingPiece(PlayingPieceTile playingPiece)
     {
+        SoundPlayer.Instance.Play("Select");
         var origColor = playingPiece.Tile.color;
         var color = new Color(origColor.r, origColor.g, origColor.b, AlphaSelected);
         playingPiece.Tile.color = color;
@@ -567,6 +571,7 @@ public class Board : MonoBehaviour
     {
         if (playingPiece != null)
         {
+            SoundPlayer.Instance.Play("Select");
             var origColor = playingPiece.Tile.color;
             var color = new Color(origColor.r, origColor.g, origColor.b, AlphaUnselected);
             playingPiece.Tile.color = color;
