@@ -44,6 +44,7 @@ public class FightBoard : MonoBehaviour
 
     public void Show()
     {
+        SoundPlayer.Instance.Play("Battle");
         CloseButton.gameObject.SetActive(false);
         gameObject.SetActive(true);
         State = FightBoardState.DiceRollStart;
@@ -59,6 +60,7 @@ public class FightBoard : MonoBehaviour
     {
         CloseButton.onClick.AddListener(() =>
         {
+            SoundPlayer.Instance.Stop("Battle");
             State = FightBoardState.Close;
         });
     }
@@ -72,39 +74,7 @@ public class FightBoard : MonoBehaviour
         {
             case FightBoardState.DiceRollStart:
                 {
-                    if (Tile1 != null && Tile1 is PlayingPieceTile t && t.Info != null)
-                    {
-                        Heading1.text = $"player {t.Player.PlayerId} " + (t.Info.IsAttacker ? " (attack)" : " (defend)");
-                        Text11.text = t.Info.PlayingPieceType.ToString().ToLower();
-                        Text12.text = t.Info.Energy.ToString();
-                        Text13.text = t.Info.Attack.ToString();
-                        Text14.text = t.Info.Defense.ToString();
-                        Text15.text = t.Info.Speed.ToString();
-                        Text16.text = t.Info.DistanceForAttack.ToString();
-                        Text17.text = t.Info.PointsForAttack.ToString();
-                    }
-                    if (Tile2 != null && Tile2 is PlayingPieceTile t2 && t2.Info != null)
-                    {
-                        Heading2.text = $"player {t2.Player.PlayerId} " + (t2.Info.IsAttacker ? " (attack)" : " (defend)");
-                        Text21.text = t2.Info.PlayingPieceType.ToString().ToLower();
-                        Text22.text = t2.Info.Energy.ToString();
-                        Text23.text = t2.Info.Attack.ToString();
-                        Text24.text = t2.Info.Defense.ToString();
-                        Text25.text = t2.Info.Speed.ToString();
-                        Text26.text = t2.Info.DistanceForAttack.ToString();
-                        Text27.text = t2.Info.PointsForAttack.ToString();
-                    }
-                    else if (Tile2 != null && Tile2 is CastleTile c && c.Info != null)
-                    {
-                        Heading2.text = $"player {c.Player.PlayerId} (defend)";
-                        Text21.text = "castle";
-                        Text22.text = c.Info.Energy.ToString();
-                        Text23.text = c.Info.Attack.ToString();
-                        Text24.text = c.Info.Defense.ToString();
-                        Text25.text = c.Info.Speed.ToString();
-                        Text26.text = "-";
-                        Text27.text = "-";
-                    }
+                    UpdateInfo();
                     Result.text = string.Empty;
                     Dice1.Roll();
                     Dice2.Roll();
@@ -153,6 +123,7 @@ public class FightBoard : MonoBehaviour
                         Result.text += $"Damage: {damage}";
                         t6.Info.Energy -= damage;
                     }
+                    UpdateInfo();
                     CloseButton.gameObject.SetActive(true);
                     State = FightBoardState.WaitForClose;
                     break;
@@ -162,6 +133,43 @@ public class FightBoard : MonoBehaviour
                     // wait for button close click
                     break;
                 }
+        }
+    }
+
+    private void UpdateInfo()
+    {
+        if (Tile1 != null && Tile1 is PlayingPieceTile t && t.Info != null)
+        {
+            Heading1.text = $"player {t.Player.PlayerId} " + (t.Info.IsAttacker ? " (attack)" : " (defend)");
+            Text11.text = t.Info.PlayingPieceType.ToString().ToLower();
+            Text12.text = t.Info.Energy.ToString();
+            Text13.text = t.Info.Attack.ToString();
+            Text14.text = t.Info.Defense.ToString();
+            Text15.text = t.Info.Speed.ToString();
+            Text16.text = t.Info.DistanceForAttack.ToString();
+            Text17.text = t.Info.PointsForAttack.ToString();
+        }
+        if (Tile2 != null && Tile2 is PlayingPieceTile t2 && t2.Info != null)
+        {
+            Heading2.text = $"player {t2.Player.PlayerId} " + (t2.Info.IsAttacker ? " (attack)" : " (defend)");
+            Text21.text = t2.Info.PlayingPieceType.ToString().ToLower();
+            Text22.text = t2.Info.Energy.ToString();
+            Text23.text = t2.Info.Attack.ToString();
+            Text24.text = t2.Info.Defense.ToString();
+            Text25.text = t2.Info.Speed.ToString();
+            Text26.text = t2.Info.DistanceForAttack.ToString();
+            Text27.text = t2.Info.PointsForAttack.ToString();
+        }
+        else if (Tile2 != null && Tile2 is CastleTile c && c.Info != null)
+        {
+            Heading2.text = $"player {c.Player.PlayerId} (defend)";
+            Text21.text = "castle";
+            Text22.text = c.Info.Energy.ToString();
+            Text23.text = c.Info.Attack.ToString();
+            Text24.text = c.Info.Defense.ToString();
+            Text25.text = c.Info.Speed.ToString();
+            Text26.text = "-";
+            Text27.text = "-";
         }
     }
 }

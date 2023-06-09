@@ -458,6 +458,16 @@ MonoBehaviour:
     Volume: 1
     Loop: 0
     Source: {fileID: 0}
+  - Name: Battle
+    Clip: {fileID: 8300000, guid: 999dcb8e5e95219438ecea673743254d, type: 3}
+    Volume: 1
+    Loop: 1
+    Source: {fileID: 0}
+  - Name: Marching
+    Clip: {fileID: 8300000, guid: c08ac5e77fe548240ab3912517544c1b, type: 3}
+    Volume: 1
+    Loop: 0
+    Source: {fileID: 0}
 --- !u!1 &24256393
 GameObject:
   m_ObjectHideFlags: 0
@@ -11455,7 +11465,7 @@ MonoBehaviour:
   - {fileID: 213031937}
   TimeToAddTileSec: 0.01
   TimeToEndRoundSec: 30
-  TimeToMovePlayingPieceSec: 0.1
+  TimeToMovePlayingPieceSec: 0.5
   AlphaSelected: 1
   AlphaUnselected: 0.390625
   ActivePlayer: {fileID: 0}
@@ -13496,9 +13506,9 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {r: 3.4155e-41, g: 3.4155e-41, b: 3.4155e-41, a: 3.4155e-41}
   - m_RefCount: 0
-    m_Data: {r: 3.4825e-41, g: 3.4825e-41, b: 3.4825e-41, a: 3.4825e-41}
+    m_Data: {r: 3.487e-41, g: 3.487e-41, b: 3.487e-41, a: 3.487e-41}
   - m_RefCount: 4
-    m_Data: {r: 1, g: 1, b: 1, a: 1}
+    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -16422,9 +16432,9 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {r: 3.4242e-41, g: 3.4242e-41, b: 3.4242e-41, a: 3.4242e-41}
   - m_RefCount: 0
-    m_Data: {r: 3.5077e-41, g: 3.5077e-41, b: 3.5077e-41, a: 3.5077e-41}
+    m_Data: {r: 3.5173e-41, g: 3.5173e-41, b: 3.5173e-41, a: 3.5173e-41}
   - m_RefCount: 4
-    m_Data: {r: 1, g: 1, b: 1, a: 1}
+    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}

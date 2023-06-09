@@ -65,7 +65,7 @@ public class GameTiles : MonoBehaviour
 
     private CastleTileInfo GetCastleTileInfo()
     {
-        return new CastleTileInfo(1, 1, 0);
+        return new CastleTileInfo(1);
     }
 
     public List<LandscapeTileInfo> GetLandscapeTileInfos()
@@ -177,6 +177,23 @@ public class GameTiles : MonoBehaviour
                 return PlayingPieceTiles[boardPosition];
             default: 
                 return null;
+        }
+    }
+
+    public void Delete(GameTile tile)
+    {
+        tile.Tilemap.SetTile(tile.BoardPosition, null);
+        switch (tile.Type)
+        {
+            case GameTile.TileType.Castle:
+                CastleTiles.Remove(tile.BoardPosition);
+                break;
+            case GameTile.TileType.Landscape:
+                LandscapeTiles.Remove(tile.BoardPosition);
+                break;
+            case GameTile.TileType.PlayingPiece:
+                PlayingPieceTiles.Remove(tile.BoardPosition);
+                break;
         }
     }
 

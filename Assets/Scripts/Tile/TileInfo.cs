@@ -57,16 +57,14 @@ public class CastleTileInfo
     public int Energy;
     public static readonly int MaxEnergy = 20;
 
-    public CastleTileInfo(int attack, int defense, int speed)
+    public CastleTileInfo(int defense)
     {
-        Attack = attack;
         Defense = defense;
-        Speed = speed;
         Energy = MaxEnergy;
     }
 
     public CastleTileInfo Clone()
     {
-        return new CastleTileInfo(Attack, Defense, Speed);
+        return new CastleTileInfo(Defense);
     }
 }

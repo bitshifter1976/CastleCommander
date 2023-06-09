@@ -76,7 +76,7 @@ public class SelectionInfoBar : MonoBehaviour
         {
             Text1.text = "castle";
             Text2.text = castle.Info.Energy.ToString();
-            Text3.text = castle.Info.Attack.ToString();
+            Text3.text = "-";
             Text4.text = castle.Info.Defense.ToString();
             Text5.text = "-";
             Text6.text = "-";

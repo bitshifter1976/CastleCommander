@@ -1,4 +1,1 @@
-- show players info on round
-- show selected playing piece info on select
-- show landscape info on select
-- do playing piece action like move, fight, heal, ...
+- make rock and medieval playlists

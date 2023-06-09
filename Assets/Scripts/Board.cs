@@ -9,6 +9,9 @@ using UnityEngine.UI;
 using TMPro;
 using Aoiti.Pathfinding;
 using static GameTiles;
+using Unity.VisualScripting;
+using static PlayingPieceTile;
+
 public class Board : MonoBehaviour
 {
     #region Definitions
@@ -249,12 +252,16 @@ public class Board : MonoBehaviour
                             FightBoard.Hide();
                             Timer.Continue();
                             if (FightBoard.Tile1 is PlayingPieceTile t && !t.Info.IsAttacker && t.Info.Energy <= 0)
-                                t.Tilemap.SetTile(t.BoardPosition, null);
-                            if (FightBoard.Tile2 is PlayingPieceTile t2 && !t2.Info.IsAttacker && t2.Info.Energy <= 0)
-                                t2.Tilemap.SetTile(t2.BoardPosition, null);
-                            if (FightBoard.Tile2 is CastleTile c && c.Info.Energy <= 0)
                             {
-                                c.Tilemap.SetTile(c.BoardPosition, null);
+                                GameTiles.Instance.Delete(FightBoard.Tile1);
+                            }
+                            else if (FightBoard.Tile2 is PlayingPieceTile t2 && !t2.Info.IsAttacker && t2.Info.Energy <= 0)
+                            {
+                                GameTiles.Instance.Delete(FightBoard.Tile2);
+                            }
+                            else if (FightBoard.Tile2 is CastleTile c && c.Info.Energy <= 0)
+                            {
+                                GameTiles.Instance.Delete(FightBoard.Tile2);
                                 State = BoardState.GameEnd;
                             }
                         }
@@ -442,7 +449,7 @@ public class Board : MonoBehaviour
             SelectPlayingPiece(leftSelectedPlayingPiece);
         // if prior selected playing piece, move it
         else if (formerLeftSelectedPlayingPiece != null && leftSelectedLandscapeTile != null && formerLeftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && MovementPath != null && !tileToMoveToHasPlayingPiece)
-            MovePlayingPiece(formerLeftSelectedPlayingPiece);
+            MovePlayingPiece();
         // if prior selected playing piece selected again, deselect it
         else if (formerLeftSelectedPlayingPiece != null && leftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece == leftSelectedPlayingPiece)
             DeselectPlayingPiece(leftSelectedPlayingPiece);
@@ -504,8 +511,8 @@ public class Board : MonoBehaviour
         SoundPlayer.Instance.Play(rangedAttack ? "RangedAttack" : "Attack");
         if (attacker is PlayingPieceTile a && defender is PlayingPieceTile d)
         {
-            a.Info.IsAttacker = a.Player.PlayerId == 1;
-            d.Info.IsAttacker = a.Player.PlayerId == 2;
+            a.Info.IsAttacker = true;
+            d.Info.IsAttacker = false;
             FightBoard.Tile1 = a.Player.PlayerId == 1 ? a : d;
             FightBoard.Tile2 = a.Player.PlayerId == 2 ? a : d;
         }
@@ -523,33 +530,37 @@ public class Board : MonoBehaviour
         if (selectUnitTypeBox != null)
             return;
 
-        SoundPlayer.Instance.Play("Select");
         selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
         selectUnitTypeBox.transform.SetParent(Hud.transform, false);
         selectUnitTypeDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
         selectUnitTypeDropdown.onValueChanged.AddListener((UnityEngine.Events.UnityAction<int>)((choice) =>
         {
-            var playingPieceType = (PlayingPieceTile.PlayingPieceTileType)choice;
-            Tile tile = null;
-            switch (playingPieceType)
+            var maxEnumValue = Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max();
+            if (choice <= maxEnumValue)
             {
-                case PlayingPieceTile.PlayingPieceTileType.Artillery:
-                    tile = ActivePlayer.ArtilleryTile;
-                    break;
-                case PlayingPieceTile.PlayingPieceTileType.Cavalry:
-                    tile = ActivePlayer.CavalryTile;
-                    break;
-                case PlayingPieceTile.PlayingPieceTileType.Infantry:
-                    tile = ActivePlayer.InfantryTile;
-                    break;
-                case PlayingPieceTile.PlayingPieceTileType.Medic:
-                    tile = ActivePlayer.MedicTile;
-                    break;
+                var playingPieceType = (PlayingPieceTileType)choice;
+                Tile tile = null;
+                switch (playingPieceType)
+                {
+                    case PlayingPieceTileType.Artillery:
+                        tile = ActivePlayer.ArtilleryTile;
+                        break;
+                    case PlayingPieceTileType.Cavalry:
+                        tile = ActivePlayer.CavalryTile;
+                        break;
+                    case PlayingPieceTileType.Infantry:
+                        tile = ActivePlayer.InfantryTile;
+                        break;
+                    case PlayingPieceTileType.Medic:
+                        tile = ActivePlayer.MedicTile;
+                        break;
+                }
+                ActivePlayer.SpawnsLeft--;
+                var tileInfo = GameTiles.Instance.PlayingPieceTileInfos.First(i => i.PlayingPieceType == playingPieceType).Clone();
+                var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, null, TilemapPlayingPieces, ActivePlayer, playingPieceType);
+                SelectPlayingPiece(tile2 as PlayingPieceTile);
             }
-            ActivePlayer.SpawnsLeft--;
-            var tileInfo = GameTiles.Instance.PlayingPieceTileInfos.First(i => i.PlayingPieceType == playingPieceType).Clone();
-            var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, null, TilemapPlayingPieces, ActivePlayer, playingPieceType);
-            SelectPlayingPiece(tile2 as PlayingPieceTile);
+
             Destroy(selectUnitTypeBox);
         }));
     }
@@ -584,10 +595,11 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void MovePlayingPiece(PlayingPieceTile selectedPlayingPiece)
+    private void MovePlayingPiece()
     {
         if (MovementPath.Count > 0)
         {
+            SoundPlayer.Instance.Play("Marching");
             movePlayingPiece = true;
             StopAllCoroutines();
             StartCoroutine(MoveFormerSelectedPlayingPiece());
@@ -619,6 +631,7 @@ public class Board : MonoBehaviour
             }
             // calculate points for movement
             ActivePlayer.PointsLeft -= (int)Math.Round(costs);
+            SoundPlayer.Instance.Stop("Marching");
             movePlayingPiece = false;
         }
     }
