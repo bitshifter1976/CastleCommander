@@ -65,6 +65,7 @@ public class Board : MonoBehaviour
     public TextMeshProUGUI MessageBoxButtonCancelText;
     public GameObject SelectUnitTypePrefab;
     public GameObject UnitTypeInfo;
+    public SelectionInfoBar UnitTypeInfoBar;
     public FightBoard FightBoard;
     [Header("Dices")]
     public List<Dice> Dices;
@@ -93,6 +94,8 @@ public class Board : MonoBehaviour
     private TMP_Dropdown selectUnitTypeDropdown;
     private bool showFightBoard;
     private bool movePlayingPiece;
+    private CastleTile leftSelectedCastle;
+    private PlayingPieceTile leftSelectedPlayingPiece;
     #endregion
 
     private void ShowMessageBox(string message, string buttonTextOk = "ok", string buttonTextCancel = null, BoardState? stateToTriggerOnOk = null, BoardState? stateToTriggerOnCancel = null)
@@ -263,6 +266,12 @@ public class Board : MonoBehaviour
                     else
                     {
                         ShowPath();
+                        if (leftSelectedPlayingPiece != null)
+                            UnitTypeInfoBar.Show(leftSelectedPlayingPiece);
+                        else if (leftSelectedCastle != null)
+                            UnitTypeInfoBar.Show(leftSelectedCastle);
+                        else 
+                            UnitTypeInfoBar.Hide();
                     }
                     break;
                 }
@@ -425,8 +434,8 @@ public class Board : MonoBehaviour
 
         // get selected game tiles
         var leftSelectedLandscapeTile = GameTiles.Instance.Get<LandscapeTile>(MouseHandler.LeftSelectedLandscapeTilePosition);
-        var leftSelectedCastle = GameTiles.Instance.Get<CastleTile>(MouseHandler.LeftSelectedLandscapeTilePosition);
-        var leftSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.LeftSelectedPlayingPiecePosition);
+        leftSelectedCastle = GameTiles.Instance.Get<CastleTile>(MouseHandler.LeftSelectedLandscapeTilePosition);
+        leftSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.LeftSelectedPlayingPiecePosition);
         var tileToMoveToHasPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.LeftSelectedLandscapeTilePosition) != null;
         // if not prior selected playing piece, select it for movement
         if (formerLeftSelectedPlayingPiece == null && leftSelectedPlayingPiece != null && leftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
@@ -564,6 +573,7 @@ public class Board : MonoBehaviour
             TilemapPlayingPieces.SetTile(playingPiece.BoardPosition, null);
             TilemapPlayingPieces.SetTile(playingPiece.BoardPosition, playingPiece.Tile);
             formerLeftSelectedPlayingPiece = null;
+            leftSelectedPlayingPiece = null;
             MouseHandler.LeftSelectedPlayingPiecePosition = Vector3Int.zero;
             MouseHandler.LeftSelectedPlayingPiece = null;
         }

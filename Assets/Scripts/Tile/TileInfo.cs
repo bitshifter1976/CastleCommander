@@ -26,25 +26,26 @@ public class PlayingPieceTileInfo
     public int Attack;
     public int Defense;
     public int Speed;
-    public int DistanceForAttack;
     public int Energy;
-    public int PointsForAttack = 10;
+    public int DistanceForAttack;
+    public int PointsForAttack;
     public bool IsAttacker;
     public static readonly int MaxEnergy = 10;
 
-    public PlayingPieceTileInfo(PlayingPieceTileType tileType, int attack, int defense, int speed, int distanceForAttack)
+    public PlayingPieceTileInfo(PlayingPieceTileType tileType, int attack, int defense, int speed, int distanceForAttack, int pointsForAttack)
     {
         PlayingPieceType = tileType;
         Attack = attack;
         Defense = defense;
         Speed = speed;
         DistanceForAttack = distanceForAttack;
+        PointsForAttack = pointsForAttack;
         Energy = MaxEnergy;
     }
 
     public PlayingPieceTileInfo Clone()
     {
-        return new PlayingPieceTileInfo(PlayingPieceType, Attack, Defense, Speed, DistanceForAttack);
+        return new PlayingPieceTileInfo(PlayingPieceType, Attack, Defense, Speed, DistanceForAttack, PointsForAttack);
     }
 }
 

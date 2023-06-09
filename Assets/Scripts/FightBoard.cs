@@ -27,6 +27,7 @@ public class FightBoard : MonoBehaviour
     public TextMeshProUGUI Text14;
     public TextMeshProUGUI Text15;
     public TextMeshProUGUI Text16;
+    public TextMeshProUGUI Text17;
 
     public TextMeshProUGUI Heading2;
     public TextMeshProUGUI Text21;
@@ -35,6 +36,7 @@ public class FightBoard : MonoBehaviour
     public TextMeshProUGUI Text24;
     public TextMeshProUGUI Text25;
     public TextMeshProUGUI Text26;
+    public TextMeshProUGUI Text27;
 
     public TextMeshProUGUI Result;
     public FightBoardState State;
@@ -79,6 +81,7 @@ public class FightBoard : MonoBehaviour
                         Text14.text = t.Info.Defense.ToString();
                         Text15.text = t.Info.Speed.ToString();
                         Text16.text = t.Info.DistanceForAttack.ToString();
+                        Text17.text = t.Info.PointsForAttack.ToString();
                     }
                     if (Tile2 != null && Tile2 is PlayingPieceTile t2 && t2.Info != null)
                     {
@@ -89,6 +92,7 @@ public class FightBoard : MonoBehaviour
                         Text24.text = t2.Info.Defense.ToString();
                         Text25.text = t2.Info.Speed.ToString();
                         Text26.text = t2.Info.DistanceForAttack.ToString();
+                        Text27.text = t2.Info.PointsForAttack.ToString();
                     }
                     else if (Tile2 != null && Tile2 is CastleTile c && c.Info != null)
                     {
@@ -98,7 +102,8 @@ public class FightBoard : MonoBehaviour
                         Text23.text = c.Info.Attack.ToString();
                         Text24.text = c.Info.Defense.ToString();
                         Text25.text = c.Info.Speed.ToString();
-                        Text26.text = "0";
+                        Text26.text = "-";
+                        Text27.text = "-";
                     }
                     Result.text = string.Empty;
                     Dice1.Roll();
