@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class MusicPlayer : MonoBehaviour
 {
+    public bool IsActive;
     public AudioClip[] Music;
     public Slider SliderVolume;
     public float InitialVolume = 0.5f;
@@ -10,7 +11,7 @@ public class MusicPlayer : MonoBehaviour
 
     private void Start()
     {
-        Audio = GetComponent<AudioSource>();
+        Audio = GetComponentInParent<AudioSource>();
         SliderVolume.value = InitialVolume;
         Audio.volume = InitialVolume;
         SliderVolume.onValueChanged.AddListener(OnVolumeChanged);
@@ -24,18 +25,19 @@ public class MusicPlayer : MonoBehaviour
 
     private void Update()
     {
-        if (!Audio.isPlaying)
+        if (IsActive && !Audio.isPlaying)
             PlayRandomMusic();
     }
 
-    private void PlayRandomMusic()
+    public void PlayRandomMusic()
     {
+        SliderVolume.value = Audio.volume;
         Audio.clip = Music[Random.Range(0, Music.Length)];
         Audio.Play();
     }
 
-    public void OnMusicVolumeChanged(float volume)
+    public void Stop()
     {
-        Audio.volume = volume;
+        Audio.Stop();
     }
 }
