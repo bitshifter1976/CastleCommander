@@ -15,7 +15,6 @@ public class MusicPlayer : MonoBehaviour
         SliderVolume.value = InitialVolume;
         Audio.volume = InitialVolume;
         SliderVolume.onValueChanged.AddListener(OnVolumeChanged);
-        PlayRandomMusic();
     }
 
     private void OnVolumeChanged(float volume)

@@ -96,7 +96,7 @@ public class Board : MonoBehaviour
     private GameObject selectUnitTypeBox;
     private TMP_Dropdown selectUnitTypeDropdown;
     private bool showFightBoard;
-    private bool movePlayingPiece;
+    private bool animationRunning;
     private CastleTile leftSelectedCastle;
     private PlayingPieceTile leftSelectedPlayingPiece;
     #endregion
@@ -268,17 +268,21 @@ public class Board : MonoBehaviour
                     }
                     else if (Timer.IsOver() || ActivePlayer.PointsLeft <= 0)
                     {
-                        State = BoardState.FinishRound;
+                        if (!animationRunning)
+                            State = BoardState.FinishRound;
                     }
                     else
                     {
-                        ShowPath();
-                        if (leftSelectedPlayingPiece != null)
-                            UnitTypeInfoBar.Show(leftSelectedPlayingPiece);
-                        else if (leftSelectedCastle != null)
-                            UnitTypeInfoBar.Show(leftSelectedCastle);
-                        else 
-                            UnitTypeInfoBar.Hide();
+                        if (!animationRunning)
+                        {
+                            ShowPath();
+                            if (leftSelectedPlayingPiece != null)
+                                UnitTypeInfoBar.Show(leftSelectedPlayingPiece);
+                            else if (leftSelectedCastle != null)
+                                UnitTypeInfoBar.Show(leftSelectedCastle);
+                            else
+                                UnitTypeInfoBar.Hide();
+                        }
                     }
                     break;
                 }
@@ -401,7 +405,7 @@ public class Board : MonoBehaviour
     private void ShowPath()
     {
         TilemapPath.ClearAllTiles();
-        if (formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId && !movePlayingPiece)
+        if (formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
         {
             ActivePlayer.Distance = GetDistance(formerLeftSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition);
             pathfinder.GenerateAstarPath(formerLeftSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition, out var path);
@@ -600,7 +604,7 @@ public class Board : MonoBehaviour
         if (MovementPath.Count > 0)
         {
             SoundPlayer.Instance.Play("Marching");
-            movePlayingPiece = true;
+            animationRunning = true;
             StopAllCoroutines();
             StartCoroutine(MoveFormerSelectedPlayingPiece());
         }
@@ -632,8 +636,8 @@ public class Board : MonoBehaviour
             // calculate points for movement
             ActivePlayer.PointsLeft -= (int)Math.Round(costs);
             SoundPlayer.Instance.Stop("Marching");
-            movePlayingPiece = false;
         }
+        animationRunning = false;
     }
 
     private float GetDistance(Vector3Int a, Vector3Int b)
