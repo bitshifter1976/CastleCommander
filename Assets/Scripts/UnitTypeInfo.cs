@@ -17,15 +17,15 @@ public class UnitTypeInfo : MonoBehaviour
 
     public Button CloseButton;
 
-    public void Show()
+    private void Start()
     {        
         Heading[0].text = "unit type";
         Heading[1].text = "energy";
         Heading[2].text = "attack";
         Heading[3].text = "defense";
         Heading[4].text = "speed";
-        Heading[5].text = $"dist att";
-        Heading[6].text = $"pts att";
+        Heading[5].text = "dist att";
+        Heading[6].text = "pts att";
 
         foreach (var tileInfo in GameTiles.Instance.PlayingPieceTileInfos)
         {

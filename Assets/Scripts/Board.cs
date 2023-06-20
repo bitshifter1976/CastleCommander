@@ -8,8 +8,6 @@ using Random = UnityEngine.Random;
 using UnityEngine.UI;
 using TMPro;
 using Aoiti.Pathfinding;
-using static GameTiles;
-using Unity.VisualScripting;
 using static PlayingPieceTile;
 
 public class Board : MonoBehaviour
@@ -319,10 +317,10 @@ public class Board : MonoBehaviour
         TilemapLandscape.ClearAllTiles();
         TilemapUnderTiles.ClearAllTiles();
         Player1.PointsLeft = 0;
-        Player1.SpawnsLeft = 10;
+        Player1.SpawnsLeft = 8;
         Player1.Distance = 0;
         Player2.PointsLeft = 0;
-        Player2.SpawnsLeft = 10;
+        Player2.SpawnsLeft = 8;
         Player2.Distance = 0;
         CreateBoard();
     }
@@ -531,7 +529,7 @@ public class Board : MonoBehaviour
 
     private void PlacePlayingPiece(Vector3Int position)
     {
-        if (selectUnitTypeBox != null)
+        if (selectUnitTypeBox != null || ActivePlayer.SpawnsLeft < 1)
             return;
 
         selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);

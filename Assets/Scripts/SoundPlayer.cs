@@ -10,31 +10,22 @@ public class SoundPlayer : MonoBehaviour
 
 	public List<Sound> Sounds;
 
-	void Awake ()
+	private void Start()
 	{
-		if (Instance != null)
-		{
-			Destroy(gameObject);
-		} 
-		else
-		{
-			Instance = this;
-			DontDestroyOnLoad(gameObject);
-            foreach (Sound s in Sounds)
-            {
-                s.Source = gameObject.AddComponent<AudioSource>();
-                s.Source.clip = s.Clip;
-                s.Source.volume = s.Volume;
-                s.Source.loop = s.Loop;
-            }
+		Instance = this;
+        foreach (var s in Sounds)
+        {
+            s.Source = gameObject.AddComponent<AudioSource>();
+            s.Source.clip = s.Clip;
+            s.Source.volume = s.Volume;
+            s.Source.loop = s.Loop;
         }
 	}
 
 	public void Play(string sound)
 	{
 		var s = Sounds.FirstOrDefault(item => item.Name == sound);
-        if (s != null)
-            s?.Source.Play();
+        s?.Source.Play();
 	}
 
     public void Play(string sound, float volume)
@@ -50,8 +41,7 @@ public class SoundPlayer : MonoBehaviour
     public void Stop(string sound)
 	{
 		var s = Sounds.FirstOrDefault(item => item.Name == sound);
-        if (s != null)
-            s.Source.Stop();
+        s?.Source.Stop();
 	}
 
 }
