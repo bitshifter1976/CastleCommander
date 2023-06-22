@@ -412,10 +412,9 @@ public class Board : MonoBehaviour
             foreach (var position in path)
             {
                 var tile = GameTiles.Instance.Get<LandscapeTile>(position);
-                var playingPiece = GameTiles.Instance.Get<PlayingPieceTile>(position);
                 costs += CalcualteMovementCosts(tile.MovementCost, formerLeftSelectedPlayingPiece.Info.Speed);
                 var pathTile = GameTiles.Instance.Path;
-                if (tile.Movable && costs <= ActivePlayer.PointsLeft && playingPiece == null && movementPossible)
+                if (tile.Movable && costs <= ActivePlayer.PointsLeft && movementPossible)
                 {
                     pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, AlphaUnselected);
                 }
@@ -438,7 +437,7 @@ public class Board : MonoBehaviour
 
     private void OnBoardLeftClick(object sender, EventArgs e)
     {
-        if (State != BoardState.PlayRound)
+        if (State != BoardState.PlayRound || animationRunning)
             return;
 
         // get selected game tiles
@@ -462,7 +461,7 @@ public class Board : MonoBehaviour
 
     private void OnBoardRightClick(object sender, EventArgs e)
     {
-        if (State != BoardState.PlayRound)
+        if (State != BoardState.PlayRound || animationRunning)
             return;
 
         // get selected game tiles
