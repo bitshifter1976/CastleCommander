@@ -129,8 +129,10 @@ public class GameTiles : MonoBehaviour
         if (tile != null && PlayingPieceTiles.ContainsKey(tile.BoardPosition))
         {
             PlayingPieceTiles.Remove(tile.BoardPosition);
+            LandscapeTiles[tile.BoardPosition].Movable = true;
             var newTile = new PlayingPieceTile(newPosition, tile.Tile, tile.Info, tile.Tilemap, tile.Id, tile.Tile.color, tile.PlayingPieceType, tile.Player, false, tile.MovementCost);
             PlayingPieceTiles.TryAdd(newPosition, newTile);
+            LandscapeTiles[newPosition].Movable = false;
             return newTile;
         }
         return null;
