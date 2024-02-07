@@ -94,34 +94,55 @@ public class FightBoard : MonoBehaviour
                     {
                         var attack = Dice1.Result + t1.Info.Attack;
                         var defense = Dice2.Result + t2.Info.Defense;
-                        Result.text =  $"Attack: {Dice1.Result} + {t1.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
-                        Result.text += $"Defense: {Dice2.Result} + {t2.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
+                        Result.text =  $"attack: {Dice1.Result} + {t1.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
+                        Result.text += $"defense: {Dice2.Result} + {t2.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
                         var damage = attack - defense;
-                        if (damage < 0) damage = 0;
-                        Result.text += $"Damage: {damage}";
-                        t2.Info.Energy -= damage;
+                        if (damage < 0)
+                        {
+                            t1.Info.Energy += damage;
+                            Result.text += $"damage to player {t1.Player.PlayerId} : {-damage}";
+                        }
+                        else
+                        {
+                            t2.Info.Energy -= damage;
+                            Result.text += $"damage to player {t2.Player.PlayerId}: {damage}";
+                        }
                     }
                     if (Tile1 is PlayingPieceTile t3 && !t3.Info.IsAttacker && Tile2 is PlayingPieceTile t4)
                     {
                         var attack = Dice2.Result + t4.Info.Attack;
                         var defense = Dice1.Result + t3.Info.Defense;
-                        Result.text = $"Attack: {Dice2.Result} + {t4.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
-                        Result.text += $"Defense: {Dice1.Result} + {t3.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
+                        Result.text = $"attack: {Dice2.Result} + {t4.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
+                        Result.text += $"defense: {Dice1.Result} + {t3.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
                         var damage = attack - defense;
-                        if (damage < 0) damage = 0;
-                        Result.text += $"Damage: {damage}";
-                        t3.Info.Energy -= damage;
+                        if (damage < 0)
+                        {
+                            t4.Info.Energy += damage;
+                            Result.text += $"damage to player {t4.Player.PlayerId} : {-damage}";
+                        }
+                        else
+                        {
+                            t3.Info.Energy -= damage;
+                            Result.text += $"damage to player {t3.Player.PlayerId}: {damage}";
+                        }
                     }
                     else if (Tile1 is PlayingPieceTile t5 && t5.Info.IsAttacker && Tile2 is CastleTile t6)
                     {
                         var attack = Dice1.Result + t5.Info.Attack;
                         var defense = Dice2.Result + t6.Info.Attack;
-                        Result.text = $"Attack: {Dice1.Result} + {t5.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
-                        Result.text += $"Defense: {Dice2.Result} + {t6.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
+                        Result.text = $"attack: {Dice1.Result} + {t5.Info.Attack} = {attack}{Environment.NewLine}{Environment.NewLine}";
+                        Result.text += $"defense: {Dice2.Result} + {t6.Info.Defense} = {defense}{Environment.NewLine}{Environment.NewLine}";
                         var damage = attack - defense;
-                        if (damage < 0) damage = 0;
-                        Result.text += $"Damage: {damage}";
-                        t6.Info.Energy -= damage;
+                        if (damage < 0)
+                        {
+                            t5.Info.Energy += damage;
+                            Result.text += $"damage to player {t5.Player.PlayerId} : {-damage}";
+                        }
+                        else
+                        {
+                            t6.Info.Energy -= damage;
+                            Result.text += $"damage to castle {t6.Player.PlayerId}: {damage}";
+                        }
                     }
                     UpdateInfo();
                     CloseButton.gameObject.SetActive(true);
