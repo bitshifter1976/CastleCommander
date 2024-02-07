@@ -11,7 +11,7 @@ public class MusicPlayer : MonoBehaviour
 
     private void Start()
     {
-        Audio = GetComponentInParent<AudioSource>();
+        Audio = GetComponent<AudioSource>();
         SliderVolume.value = InitialVolume;
         Audio.volume = InitialVolume;
         SliderVolume.onValueChanged.AddListener(OnVolumeChanged);
@@ -26,6 +26,8 @@ public class MusicPlayer : MonoBehaviour
     {
         if (IsActive && !Audio.isPlaying)
             PlayRandomMusic();
+        if (!IsActive && Audio.isPlaying)
+            Stop();
     }
 
     public void PlayRandomMusic()

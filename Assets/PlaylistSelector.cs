@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlaylistSelector : MonoBehaviour
 {
@@ -12,23 +13,30 @@ public class PlaylistSelector : MonoBehaviour
 
     private void Start()
     {
-        PlaylistDropdown.onValueChanged.AddListener((UnityEngine.Events.UnityAction<int>)((choice) =>
-        {
-            PlayerRock.Stop();
-            PlayerMedieval.Stop();
+        var choice = PlayerRock.IsActive ? 0 : 1;
+        SelectPlaylist(choice);
+        PlaylistDropdown.value = choice;
 
-            if (choice == 0)
-            {
-                PlayerMedieval.IsActive = false;
+        PlaylistDropdown.onValueChanged.AddListener((choice) =>
+        {
+            SelectPlaylist(choice);
+        });
+    }
+
+    private void SelectPlaylist(int choice)
+    {
+        switch (choice)
+        {
+            case 0:
                 PlayerRock.IsActive = true;
-                PlayerRock.PlayRandomMusic();
-            }
-            else
-            {
-                PlayerRock.IsActive = false;
+                PlayerMedieval.IsActive = false;
+                break;
+            case 1:
                 PlayerMedieval.IsActive = true;
-                PlayerMedieval.PlayRandomMusic();
-            }
-        }));
+                PlayerRock.IsActive = false;
+                break;
+            default:
+                break;
+        }
     }
 }
