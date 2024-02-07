@@ -99,7 +99,7 @@ public class Board : MonoBehaviour
     private PlayingPieceTile leftSelectedPlayingPiece;
     #endregion
 
-    private void ShowMessageBox(string message, string buttonTextOk = "ok", string buttonTextCancel = null, BoardState? stateToTriggerOnOk = null, BoardState? stateToTriggerOnCancel = null)
+    private bool ShowMessageBox(string message, string buttonTextOk = "ok", string buttonTextCancel = null, BoardState? stateToTriggerOnOk = null, BoardState? stateToTriggerOnCancel = null)
     {
         if (!MessageBox.activeSelf)
         {
@@ -128,6 +128,7 @@ public class Board : MonoBehaviour
             });
             MessageBox.SetActive(true);
         }
+        return MessageBox.activeSelf;
     }
 
     private void Start()
@@ -231,6 +232,8 @@ public class Board : MonoBehaviour
                     {
                         ActivePlayer.PointsLeft = activeDices.Sum(d => d.Result) * 10;
                         Timer.StartTimer(TimeToEndRoundSec);
+                        if (ActivePlayer.IsAi)
+                            ActivePlayer.Think(this);
                         State = BoardState.PlayRound;
                     }
                     break;
@@ -435,9 +438,16 @@ public class Board : MonoBehaviour
         return costs / (speed / maxSpeed * 2f);
     }
 
+    public void DoLeftClick(GameTile tile)
+    {
+        MouseHandler.LeftSelectedLandscapeTilePosition = tile.BoardPosition;
+        MouseHandler.LeftSelectedPlayingPiecePosition = tile.BoardPosition;
+        OnBoardLeftClick(null, null);
+    }
+
     private void OnBoardLeftClick(object sender, EventArgs e)
     {
-        if (State != BoardState.PlayRound || animationRunning)
+        if ((State != BoardState.PlayRound && !ActivePlayer.IsAi) || animationRunning)
             return;
 
         // get selected game tiles
@@ -457,6 +467,13 @@ public class Board : MonoBehaviour
         // if own castle clicked, spawn playing piece
         else if (leftSelectedCastle != null && leftSelectedCastle.Player.PlayerId == ActivePlayer.PlayerId)
             PlacePlayingPiece(MouseHandler.LeftSelectedLandscapeTilePosition);
+    }
+
+    public void DoRightClick(GameTile tile)
+    {
+        MouseHandler.RightSelectedLandscapeTilePosition = tile.BoardPosition;
+        MouseHandler.RightSelectedPlayingPiecePosition = tile.BoardPosition;
+        OnBoardRightClick(null, null);
     }
 
     private void OnBoardRightClick(object sender, EventArgs e)
