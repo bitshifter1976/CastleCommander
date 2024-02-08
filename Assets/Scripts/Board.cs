@@ -276,7 +276,7 @@ public class Board : MonoBehaviour
                     {
                         if (!animationRunning)
                         {
-                            ShowPath();
+                            ShowPath(MouseHandler.MouseOverLandscapeTilePosition);
                             if (leftSelectedPlayingPiece != null)
                                 UnitTypeInfoBar.Show(leftSelectedPlayingPiece);
                             else if (leftSelectedCastle != null)
@@ -389,12 +389,6 @@ public class Board : MonoBehaviour
         return tileCreated;
     }
 
-    private void HideSelectUnitTypeBox()
-    {
-        if (selectUnitTypeBox != null)
-            Destroy(selectUnitTypeBox);
-    }
-
     private void SelectActiveCastle()
     {
         var selectedPlayingField = GameTiles.Instance.GetCastle(ActivePlayer.PlayerId);
@@ -403,21 +397,23 @@ public class Board : MonoBehaviour
         TilemapCastleSelect.SetTile(selectedPlayingField.BoardPosition, selectedCastle);
     }
 
-    private void ShowPath()
+    public bool ShowPath(Vector3Int toPosition)
     {
+        var movementPossible = false;
         TilemapPath.ClearAllTiles();
         if (formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
         {
-            ActivePlayer.Distance = GetDistance(formerLeftSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition);
-            pathfinder.GenerateAstarPath(formerLeftSelectedPlayingPiece.BoardPosition, MouseHandler.MouseOverLandscapeTilePosition, out var path);
+            ActivePlayer.Distance = GetDistance(formerLeftSelectedPlayingPiece.BoardPosition, toPosition);
+            pathfinder.GenerateAstarPath(formerLeftSelectedPlayingPiece.BoardPosition, toPosition, out var path);
             var costs = 0f;
-            var movementPossible = true;
+            movementPossible = true;
             foreach (var position in path)
             {
+                var castle = GameTiles.Instance.Get<CastleTile>(position);
                 var tile = GameTiles.Instance.Get<LandscapeTile>(position);
                 costs += CalcualteMovementCosts(tile.MovementCost, formerLeftSelectedPlayingPiece.Info.Speed);
                 var pathTile = GameTiles.Instance.Path;
-                if (tile.Movable && costs <= ActivePlayer.PointsLeft && movementPossible)
+                if (tile.Movable && costs <= ActivePlayer.PointsLeft && movementPossible && castle == null)
                 {
                     pathTile.color = new Color(Color.green.r, Color.green.g, Color.green.b, AlphaUnselected);
                 }
@@ -430,6 +426,7 @@ public class Board : MonoBehaviour
             }
             MovementPath = movementPossible ? path : null;
         }
+        return movementPossible;
     }
 
     private float CalcualteMovementCosts(int costs, int speed)
@@ -440,8 +437,11 @@ public class Board : MonoBehaviour
 
     public void DoLeftClick(GameTile tile)
     {
+        if (tile == null)
+            return;
         MouseHandler.LeftSelectedLandscapeTilePosition = tile.BoardPosition;
-        MouseHandler.LeftSelectedPlayingPiecePosition = tile.BoardPosition;
+        if (tile is PlayingPieceTile)
+            MouseHandler.LeftSelectedPlayingPiecePosition = tile.BoardPosition;
         OnBoardLeftClick(null, null);
     }
 
@@ -469,11 +469,12 @@ public class Board : MonoBehaviour
             PlacePlayingPiece(MouseHandler.LeftSelectedLandscapeTilePosition);
     }
 
-    public void DoRightClick(GameTile tile)
+    public bool DoRightClick(GameTile tile)
     {
         MouseHandler.RightSelectedLandscapeTilePosition = tile.BoardPosition;
-        MouseHandler.RightSelectedPlayingPiecePosition = tile.BoardPosition;
-        OnBoardRightClick(null, null);
+        if (tile is PlayingPieceTile)
+            MouseHandler.RightSelectedPlayingPiecePosition = tile.BoardPosition;
+        return Attack();
     }
 
     private void OnBoardRightClick(object sender, EventArgs e)
@@ -481,6 +482,12 @@ public class Board : MonoBehaviour
         if (State != BoardState.PlayRound || animationRunning)
             return;
 
+        Attack();
+    }
+
+    private bool Attack()
+    {
+        var enemyAttacked = false;
         // get selected game tiles
         var rightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.RightSelectedPlayingPiecePosition);
         var rightSelectedCaste = GameTiles.Instance.Get<CastleTile>(MouseHandler.RightSelectedLandscapeTilePosition);
@@ -506,7 +513,9 @@ public class Board : MonoBehaviour
                         HealPlayingPiece(attacker, defender);
                     break;
             }
+            enemyAttacked = true;
         }
+        // if prior left selected playing piece and right selected castle
         else if (formerLeftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= formerLeftSelectedPlayingPiece.Info.PointsForAttack)
         {
             ActivePlayer.PointsLeft -= formerLeftSelectedPlayingPiece.Info.PointsForAttack;
@@ -514,8 +523,12 @@ public class Board : MonoBehaviour
             var defender = rightSelectedCaste;
             ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
             if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+            {
                 ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
+                enemyAttacked = true;
+            }
         }
+        return enemyAttacked;
     }
 
     private void HealPlayingPiece(PlayingPieceTile attacker, PlayingPieceTile defender)
@@ -548,10 +561,15 @@ public class Board : MonoBehaviour
         if (selectUnitTypeBox != null || ActivePlayer.SpawnsLeft < 1)
             return;
 
+        ShowSelectUnitType(position);
+    }
+
+    private void ShowSelectUnitType(Vector3Int position)
+    {
         selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
         selectUnitTypeBox.transform.SetParent(Hud.transform, false);
         selectUnitTypeDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
-        selectUnitTypeDropdown.onValueChanged.AddListener((UnityEngine.Events.UnityAction<int>)((choice) =>
+        selectUnitTypeDropdown.onValueChanged.AddListener((choice) =>
         {
             var maxEnumValue = Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max();
             if (choice <= maxEnumValue)
@@ -580,7 +598,18 @@ public class Board : MonoBehaviour
             }
 
             Destroy(selectUnitTypeBox);
-        }));
+        });
+    }
+
+    private void HideSelectUnitTypeBox()
+    {
+        if (selectUnitTypeBox != null)
+            Destroy(selectUnitTypeBox);
+    }
+
+    public void DoSelectUnitType(PlayingPieceTileType type)
+    {
+        selectUnitTypeDropdown.value = (int)type;
     }
 
     private void SelectPlayingPiece(PlayingPieceTile playingPiece)
@@ -654,7 +683,7 @@ public class Board : MonoBehaviour
         animationRunning = false;
     }
 
-    private float GetDistance(Vector3Int a, Vector3Int b)
+    public float GetDistance(Vector3Int a, Vector3Int b)
     {
         return (a - b).sqrMagnitude;
     }
