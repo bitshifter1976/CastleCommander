@@ -270,7 +270,12 @@ public class Board : MonoBehaviour
                     else if (Timer.IsOver() || ActivePlayer.PointsLeft <= 0)
                     {
                         if (!animationRunning)
+                        {
+                            leftSelectedCastle = null;
+                            leftSelectedPlayingPiece = null;
+                            formerLeftSelectedPlayingPiece = null;
                             State = BoardState.FinishRound;
+                        }
                     }
                     else
                     {
@@ -442,8 +447,7 @@ public class Board : MonoBehaviour
         if (tile == null)
             return;
         MouseHandler.LeftSelectedLandscapeTilePosition = tile.BoardPosition;
-        if (tile is PlayingPieceTile)
-            MouseHandler.LeftSelectedPlayingPiecePosition = tile.BoardPosition;
+        MouseHandler.LeftSelectedPlayingPiecePosition = tile.BoardPosition;
         OnBoardLeftClick(null, null);
     }
 
@@ -474,8 +478,8 @@ public class Board : MonoBehaviour
     public bool DoRightClick(GameTile tile)
     {
         MouseHandler.RightSelectedLandscapeTilePosition = tile.BoardPosition;
-        if (tile is PlayingPieceTile)
-            MouseHandler.RightSelectedPlayingPiecePosition = tile.BoardPosition;
+        MouseHandler.RightSelectedPlayingPiecePosition = tile.BoardPosition;
+        formerLeftSelectedPlayingPiece = leftSelectedPlayingPiece;
         return Attack();
     }
 
@@ -646,7 +650,7 @@ public class Board : MonoBehaviour
 
     private void MovePlayingPiece()
     {
-        if (MovementPath.Count > 0)
+        if (MovementPath.Count > 0 && formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.BoardPosition != null)
         {
             SoundPlayer.Instance.Play("Marching");
             animationRunning = true;
