@@ -215,6 +215,8 @@ public class Board : MonoBehaviour
                 {
                     ShowMessageBox($"player {ActivePlayer.PlayerId} get ready!", "go", null, BoardState.RollDiceStart);
                     SelectActiveCastle();
+                    if (ActivePlayer.IsAi)
+                        ActivePlayer.Think(this);
                     break;
                 }
             case BoardState.RollDiceStart:
@@ -232,8 +234,6 @@ public class Board : MonoBehaviour
                     {
                         ActivePlayer.PointsLeft = activeDices.Sum(d => d.Result) * 10;
                         Timer.StartTimer(TimeToEndRoundSec);
-                        if (ActivePlayer.IsAi)
-                            ActivePlayer.Think(this);
                         State = BoardState.PlayRound;
                     }
                     break;
@@ -276,7 +276,9 @@ public class Board : MonoBehaviour
                     {
                         if (!animationRunning)
                         {
-                            ShowPath(MouseHandler.MouseOverLandscapeTilePosition);
+                            if (!ActivePlayer.IsAi)
+                                ShowPath(MouseHandler.MouseOverLandscapeTilePosition);
+
                             if (leftSelectedPlayingPiece != null)
                                 UnitTypeInfoBar.Show(leftSelectedPlayingPiece);
                             else if (leftSelectedCastle != null)

@@ -120,8 +120,8 @@ public class GameTiles : MonoBehaviour
         var tiles = GetLandscapeTileInfos();
         var possibleTiles = tiles.Where(t => t.Probability >= probability).Select(s => s.Tile).ToList();
         if (possibleTiles.Count == 0)
-            possibleTiles.Add(tiles[Random.Range(0, tiles.Count)].Tile);
-        return possibleTiles[Random.Range(0, possibleTiles.Count)];
+            possibleTiles.Add(tiles[Random.Range(0, tiles.Count - 1)].Tile);
+        return possibleTiles[Random.Range(0, possibleTiles.Count - 1)];
     }
 
     public PlayingPieceTile Move(PlayingPieceTile tile, Vector3Int newPosition)

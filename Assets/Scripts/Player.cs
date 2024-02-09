@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -27,50 +29,60 @@ public class Player : MonoBehaviour
     {
         if (Thinking)
             return;
+        
+        StartCoroutine(SimulatePlayer(board));
+    }
 
+    private IEnumerator SimulatePlayer(Board board)
+    {
         Thinking = true;
 
-        // 1. get playing pieces and castle for ai player
-        var playingPiecesOnBoard = GameTiles.Instance.PlayingPieceTiles.Where(t => t.Value.Player.PlayerId == PlayerId).ToList();
+        // 1. start round by pressing ok
+        yield return new WaitForSeconds(3f);
+        board.MessageBoxButtonOk.onClick.Invoke();
+        yield return new WaitForSeconds(1f);
+
+        // 2. TODO: show 'thinking...' above castle
+
+        // 3. get playing pieces and castle for ai player
+        var units = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId == PlayerId).ToList();
         var castle = GameTiles.Instance.CastleTiles.Values.First(c => c.Player.PlayerId == PlayerId);
+        var enemyUnits = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId != PlayerId).ToList();
         var enemyCastle = GameTiles.Instance.CastleTiles.Values.First(c => c.Player.PlayerId != PlayerId);
 
-        // 2. if no playing piece found on board, select castle and spawn unit
-        if (playingPiecesOnBoard.Count == 0 || Random.Range(0, 5) == 0)
+        // 4. if no playing piece found on board or sometimes, select castle and spawn unit
+        if (units.Count == 0 || Random.Range(0, 5) == 0)
         {
-            board.DoLeftClick(castle);
-            var randomUnitType = (PlayingPieceTileType)Random.Range(Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Min(), Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max() + 1);
-            board.DoSelectUnitType(randomUnitType);
-            var newUnit = GameTiles.Instance.Get<PlayingPieceTile>(board.MouseHandler.LeftSelectedPlayingPiecePosition);
-            board.DoLeftClick(newUnit);
+            yield return StartCoroutine(SpawnUnit(board, castle, units));
+            units = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId == PlayerId).ToList();
         }
 
-        // 3. attack enemy castle if possible, then try to attack some other enemy unit
-        var enemyInAttackRangeFound = false;
-        while (board.ActivePlayer.PointsLeft > 0 && !enemyInAttackRangeFound)
-        {
-            if (board.DoRightClick(enemyCastle))
-            {
-                enemyInAttackRangeFound |= true;
-            }
-            else
-            {
-                var possibleUnitsToAttack = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId != PlayerId).ToList();
-                foreach (var possibleUnit in possibleUnitsToAttack)
-                {
-                    if (board.DoRightClick(possibleUnit))
-                    {
-                        enemyInAttackRangeFound = true;
-                        break;
-                    }
-                }
-            }
-        }
+        // 5. attack enemy castle if possible, then try to attack some other enemy unit
+        yield return StartCoroutine(TryToAttack(board, enemyUnits, enemyCastle));
 
-        // 4. move any unit
-        var possibleUnits = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId == PlayerId).ToList();
-        var anyUnit = possibleUnits[Random.Range(0, possibleUnits.Count)];
+        // 6. move any unit
+        yield return StartCoroutine(MoveAnyUnit(board, units, enemyCastle));
+
+        // 7. attack enemy castle if possible, then try to attack some other enemy unit
+        yield return StartCoroutine(TryToAttack(board, enemyUnits, enemyCastle));
+
+        // 8. end round
+        board.ButtonEndTurn.onClick.Invoke();
+
+        Thinking = false;
+    }
+
+    private IEnumerator MoveAnyUnit(Board board, List<PlayingPieceTile> units, CastleTile enemyCastle)
+    {
+        if (units.Count == 0)
+            yield break;
+
+        // select random unit
+        var anyUnit = units[Random.Range(0, units.Count-1)];
         board.DoLeftClick(anyUnit);
+        yield return new WaitForSeconds(1f);
+
+        // try to move unit to random tile
         GameTile tile = null;
         var maxIterations = 100;
         var iteration = 0;
@@ -78,48 +90,74 @@ public class Player : MonoBehaviour
         {
             iteration++;
             var possibleTiles = GameTiles.Instance.LandscapeTiles.Values.Where(t => t.Movable).ToList();
-            if (possibleTiles.Count == 0)
-                break;
-            tile = possibleTiles[Random.Range(0, possibleTiles.Count)];
-            if (board.ShowPath(tile.BoardPosition))
+            if (possibleTiles.Count > 0)
             {
-                // if new position is closer to enemy castle then go
-                var oldDistance = board.GetDistance(enemyCastle.BoardPosition, anyUnit.BoardPosition);
-                var newDistance = board.GetDistance(enemyCastle.BoardPosition, tile.BoardPosition);
-                if (newDistance > oldDistance)
+                tile = possibleTiles[Random.Range(0, possibleTiles.Count - 1)];
+                if (board.ShowPath(tile.BoardPosition))
+                {
+                    var oldDistance = board.GetDistance(enemyCastle.BoardPosition, anyUnit.BoardPosition);
+                    var newDistance = board.GetDistance(enemyCastle.BoardPosition, tile.BoardPosition);
+                    if (newDistance > oldDistance)
+                    {
+                        tile = null;
+                    }
+                    else
+                    {
+                        // if new position is closer to enemy castle then go but wait a little
+                        board.DoLeftClick(tile);
+                        yield return new WaitForSeconds(1f);
+                    }
+                }
+                else
                 {
                     tile = null;
                 }
             }
-            else
-            {
-                tile = null;
-            }
         }
-        board.DoLeftClick(tile);
+        // deselect moved unit
+        yield return new WaitForSeconds(1f);
+        board.DoLeftClick(anyUnit);
+    }
 
-        // 5. attack enemy castle if possible, then try to attack some other enemy unit
-        enemyInAttackRangeFound = false;
-        while (board.ActivePlayer.PointsLeft > 0 && !enemyInAttackRangeFound)
+    private IEnumerator SpawnUnit(Board board, CastleTile castle, List<PlayingPieceTile> units)
+    {
+        // select castle
+        board.DoLeftClick(castle);
+        yield return new WaitForSeconds(1f);
+        // select unit type in popup
+        var randomUnitType = (PlayingPieceTileType)Random.Range(0, Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max());
+        board.DoSelectUnitType(randomUnitType);
+        yield return new WaitForSeconds(1f);
+        // deselect unit
+        board.DoLeftClick(castle);
+        yield return new WaitForSeconds(1f);
+    }
+
+    private IEnumerator TryToAttack(Board board, List<PlayingPieceTile> enemyUnits, CastleTile enemyCastle)
+    {
+        var enemyInAttackRangeFound = false;
+        var maxIterations = 100;
+        var iteration = 0;
+        while (board.ActivePlayer.PointsLeft > 0 && !enemyInAttackRangeFound && iteration < maxIterations)
         {
+            iteration++;
             if (board.DoRightClick(enemyCastle))
             {
-                enemyInAttackRangeFound |= true;
+                enemyInAttackRangeFound = true;
+                yield return new WaitForSeconds(1f);
             }
             else
             {
-                var possibleUnitsToAttack = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId != PlayerId).ToList();
-                foreach (var possibleUnit in possibleUnitsToAttack)
+                foreach (var enemyUnit in enemyUnits)
                 {
-                    if (board.DoRightClick(possibleUnit))
+                    if (board.DoRightClick(enemyUnit))
                     {
                         enemyInAttackRangeFound = true;
+                        yield return new WaitForSeconds(1f);
                         break;
                     }
                 }
             }
         }
-
-        Thinking = false;
     }
 }
