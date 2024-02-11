@@ -58,11 +58,13 @@ public class FightBoard : MonoBehaviour
 
     private void Start()
     {
-        CloseButton.onClick.AddListener(() =>
-        {
-            SoundPlayer.Instance.Stop("Battle");
-            State = FightBoardState.Close;
-        });
+        Invoke("CloseBoard", 5f);
+    }
+
+    private void CloseBoard()
+    {
+        SoundPlayer.Instance.Stop("Battle");
+        State = FightBoardState.Close;
     }
 
     private void Update()

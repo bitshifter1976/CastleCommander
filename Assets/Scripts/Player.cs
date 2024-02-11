@@ -58,7 +58,7 @@ public class Player : MonoBehaviour
         }
 
         // 5. attack enemy castle if possible, then try to attack some other enemy unit
-        //yield return StartCoroutine(TryToAttack(board, castle, units, enemyCastle, enemyUnits));
+        yield return StartCoroutine(TryToAttack(board, castle, units, enemyCastle, enemyUnits));
 
         // 6. move any unit
         yield return StartCoroutine(MoveAnyUnit(board, castle, units, enemyCastle, enemyUnits));
@@ -106,7 +106,9 @@ public class Player : MonoBehaviour
                     {
                         // if new position is closer to enemy castle then go but wait a little
                         board.DoLeftClick(tile);
-                        yield return new WaitForSeconds(1f);
+                        // wait until movement finished
+                        while (board.AnimationRunning)
+                            yield return new WaitForSeconds(1f);
                     }
                 }
                 else
@@ -115,9 +117,7 @@ public class Player : MonoBehaviour
                 }
             }
         }
-        // deselect moved unit
-        yield return new WaitForSeconds(5f);
-        board.DoLeftClick(anyUnit);
+        yield return new WaitForSeconds(1f);
     }
 
     private IEnumerator SpawnUnit(Board board, CastleTile castle, List<PlayingPieceTile> units, CastleTile enemyCastle, List<PlayingPieceTile> enemyUnits)
@@ -128,9 +128,6 @@ public class Player : MonoBehaviour
         // select unit type in popup
         var randomUnitType = (PlayingPieceTileType)Random.Range(0, Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max());
         board.DoSelectUnitType(randomUnitType);
-        yield return new WaitForSeconds(1f);
-        // deselect unit
-        board.DoLeftClick(castle);
         yield return new WaitForSeconds(1f);
     }
 
@@ -144,24 +141,34 @@ public class Player : MonoBehaviour
             iteration++;
             foreach (var unit in units)
             {
+                // select unit
+                board.DoLeftClick(unit);
+                // if castle in range attack
                 if (board.DoRightClick(enemyCastle))
                 {
                     enemyInAttackRangeFound = true;
-                    yield return new WaitForSeconds(1f);
+                    while (board.FightBoardShowing)
+                        yield return new WaitForSeconds(1f);
                     yield break;
                 }
                 else
                 {
                     foreach (var enemyUnit in enemyUnits)
                     {
+                        // if enemy in range attack
                         if (board.DoRightClick(enemyUnit))
                         {
                             enemyInAttackRangeFound = true;
-                            yield return new WaitForSeconds(1f);
+                            while (board.FightBoardShowing)
+                                yield return new WaitForSeconds(1f);
                             yield break;
                         }
                     }
+                    if (enemyInAttackRangeFound)
+                        yield break;
                 }
+                // deselect unit if not attacked, otherwise we break
+                board.DoLeftClick(unit);
             }
         }
     }

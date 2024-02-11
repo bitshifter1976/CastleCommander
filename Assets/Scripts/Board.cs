@@ -85,6 +85,8 @@ public class Board : MonoBehaviour
     public List<Vector3Int> MovementPath;
     public Vector3Int[] MovementDirectionsOdd  = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
     public Vector3Int[] MovementDirectionsEven = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(-1, 1, 0)/*top-left*/, new Vector3Int(0, 1, 0)/*top-right*/, new Vector3Int(-1, -1, 0)/*bottom-left*/, new Vector3Int(0, -1, 0)/*bottom-right*/ };
+    public bool AnimationRunning;
+    public bool FightBoardShowing;
 
     private readonly Dictionary<Vector3Int, Tile> tilesLandscape = new();
     private readonly Dictionary<Vector3Int, Tile> tilesUnderTiles = new();
@@ -93,8 +95,6 @@ public class Board : MonoBehaviour
     private Pathfinder<Vector3Int> pathfinder;
     private GameObject selectUnitTypeBox;
     private TMP_Dropdown selectUnitTypeDropdown;
-    private bool showFightBoard;
-    private bool animationRunning;
     private CastleTile leftSelectedCastle;
     private PlayingPieceTile leftSelectedPlayingPiece;
     #endregion
@@ -134,7 +134,7 @@ public class Board : MonoBehaviour
     private void Start()
     {
         MessageBox.SetActive(false);
-        showFightBoard = false;
+        FightBoardShowing = false;
         ActivePlayer = Player1;
         Player1.Active = true;
         Player2.Active = false;
@@ -240,18 +240,16 @@ public class Board : MonoBehaviour
                 }
             case BoardState.PlayRound:
                 {
-                    if (showFightBoard)
+                    if (FightBoardShowing)
                     {
                         if (FightBoard.State == FightBoard.FightBoardState.Hidden)
                         {
-                            Timer.Pause();
                             FightBoard.Show();
                         }
                         else if (FightBoard.State == FightBoard.FightBoardState.Close)
                         {
-                            showFightBoard = false;
+                            FightBoardShowing = false;
                             FightBoard.Hide();
-                            Timer.Continue();
                             if (FightBoard.Tile1 is PlayingPieceTile t && !t.Info.IsAttacker && t.Info.Energy <= 0)
                             {
                                 GameTiles.Instance.Delete(FightBoard.Tile1);
@@ -269,7 +267,7 @@ public class Board : MonoBehaviour
                     }
                     else if (Timer.IsOver() || ActivePlayer.PointsLeft <= 0)
                     {
-                        if (!animationRunning)
+                        if (!AnimationRunning)
                         {
                             leftSelectedCastle = null;
                             leftSelectedPlayingPiece = null;
@@ -279,7 +277,7 @@ public class Board : MonoBehaviour
                     }
                     else
                     {
-                        if (!animationRunning)
+                        if (!AnimationRunning)
                         {
                             if (!ActivePlayer.IsAi)
                                 ShowPath(MouseHandler.MouseOverLandscapeTilePosition);
@@ -453,7 +451,7 @@ public class Board : MonoBehaviour
 
     private void OnBoardLeftClick(object sender, EventArgs e)
     {
-        if ((State != BoardState.PlayRound && !ActivePlayer.IsAi) || animationRunning)
+        if ((State != BoardState.PlayRound && !ActivePlayer.IsAi) || AnimationRunning)
             return;
 
         // get selected game tiles
@@ -485,7 +483,7 @@ public class Board : MonoBehaviour
 
     private void OnBoardRightClick(object sender, EventArgs e)
     {
-        if (State != BoardState.PlayRound || animationRunning)
+        if (State != BoardState.PlayRound || AnimationRunning)
             return;
 
         Attack();
@@ -559,7 +557,7 @@ public class Board : MonoBehaviour
             FightBoard.Tile1 = a2;
             FightBoard.Tile2 = c;
         }
-        showFightBoard = true;
+        FightBoardShowing = true;
     }
 
     private void PlacePlayingPiece(Vector3Int position)
@@ -653,7 +651,7 @@ public class Board : MonoBehaviour
         if (MovementPath.Count > 0 && formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.BoardPosition != null)
         {
             SoundPlayer.Instance.Play("Marching");
-            animationRunning = true;
+            AnimationRunning = true;
             StopAllCoroutines();
             StartCoroutine(MoveFormerSelectedPlayingPiece());
         }
@@ -686,7 +684,7 @@ public class Board : MonoBehaviour
             ActivePlayer.PointsLeft -= (int)Math.Round(costs);
             SoundPlayer.Instance.Stop("Marching");
         }
-        animationRunning = false;
+        AnimationRunning = false;
     }
 
     public float GetDistance(Vector3Int a, Vector3Int b)
