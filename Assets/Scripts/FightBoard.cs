@@ -48,17 +48,13 @@ public class FightBoard : MonoBehaviour
         CloseButton.gameObject.SetActive(false);
         gameObject.SetActive(true);
         State = FightBoardState.DiceRollStart;
+        Invoke("CloseBoard", 5f);
     }
 
     public void Hide()
     {
         gameObject.SetActive(false);
         State = FightBoardState.Hidden;
-    }
-
-    private void Start()
-    {
-        Invoke("CloseBoard", 5f);
     }
 
     private void CloseBoard()

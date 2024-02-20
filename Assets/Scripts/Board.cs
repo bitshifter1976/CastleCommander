@@ -440,13 +440,20 @@ public class Board : MonoBehaviour
         return costs / (speed / maxSpeed * 2f);
     }
 
-    public void DoLeftClick(GameTile tile)
+    public bool SimulateLeftClick(GameTile tile)
+    {
+        StartCoroutine(DoLeftClickAsync(tile));
+        return TryToAttack(tile);
+    }
+
+    private IEnumerator DoLeftClickAsync(GameTile tile)
     {
         if (tile == null)
-            return;
+            yield return null;
         MouseHandler.LeftSelectedLandscapeTilePosition = tile.BoardPosition;
         MouseHandler.LeftSelectedPlayingPiecePosition = tile.BoardPosition;
         OnBoardLeftClick(null, null);
+        yield return null;
     }
 
     private void OnBoardLeftClick(object sender, EventArgs e)
@@ -473,12 +480,18 @@ public class Board : MonoBehaviour
             PlacePlayingPiece(MouseHandler.LeftSelectedLandscapeTilePosition);
     }
 
-    public bool DoRightClick(GameTile tile)
+    public bool SimulateRightClick(GameTile tile)
+    {
+        StartCoroutine(DoRightClick(tile));
+        return TryToAttack(tile);
+    }
+
+    private IEnumerator DoRightClick(GameTile tile)
     {
         MouseHandler.RightSelectedLandscapeTilePosition = tile.BoardPosition;
         MouseHandler.RightSelectedPlayingPiecePosition = tile.BoardPosition;
-        formerLeftSelectedPlayingPiece = leftSelectedPlayingPiece;
-        return Attack();
+        Attack();
+        yield return null;
     }
 
     private void OnBoardRightClick(object sender, EventArgs e)
@@ -489,17 +502,74 @@ public class Board : MonoBehaviour
         Attack();
     }
 
+    private bool TryToAttack(GameTile tile)
+    {
+        // get selected game tiles
+        var rightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.RightSelectedPlayingPiecePosition);
+        var rightSelectedCaste = GameTiles.Instance.Get<CastleTile>(MouseHandler.RightSelectedLandscapeTilePosition);
+        // if prior left selected playing piece and right selected castle
+        if (leftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
+        {
+            ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
+            var attacker = leftSelectedPlayingPiece;
+            var defender = rightSelectedCaste;
+            ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
+            if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+            {
+                //ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
+                return true;
+            }
+        }
+        // if left selected playing piece and right selected playing piece
+        else if (leftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
+        {
+            ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
+            var attacker = leftSelectedPlayingPiece;
+            var defender = rightSelectedPlayingPiece;
+            ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
+            switch (attacker.PlayingPieceType)
+            {
+                case PlayingPieceTile.PlayingPieceTileType.Artillery:
+                case PlayingPieceTile.PlayingPieceTileType.Cavalry:
+                case PlayingPieceTile.PlayingPieceTileType.Infantry:
+                    // if defender in attack range, do attack
+                    if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                        return true;
+                    break;
+                case PlayingPieceTile.PlayingPieceTileType.Medic:
+                    // if attacker next to defender, do healing
+                    if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId == ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                        return false;
+                    break;
+            }
+        }
+        return false;
+    }
+
     private bool Attack()
     {
         var enemyAttacked = false;
         // get selected game tiles
         var rightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.RightSelectedPlayingPiecePosition);
         var rightSelectedCaste = GameTiles.Instance.Get<CastleTile>(MouseHandler.RightSelectedLandscapeTilePosition);
-        // if prior left selected playing piece and right selected playing piece
-        if (formerLeftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && ActivePlayer.PointsLeft >= formerLeftSelectedPlayingPiece.Info.PointsForAttack)
+        // if prior left selected playing piece and right selected castle
+        if (leftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
         {
-            ActivePlayer.PointsLeft -= formerLeftSelectedPlayingPiece.Info.PointsForAttack;
-            var attacker = formerLeftSelectedPlayingPiece;
+            ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
+            var attacker = leftSelectedPlayingPiece;
+            var defender = rightSelectedCaste;
+            ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
+            if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+            {
+                ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
+                enemyAttacked = true;
+            }
+        }
+        // if left selected playing piece and right selected playing piece
+        else if (leftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
+        {
+            ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
+            var attacker = leftSelectedPlayingPiece;
             var defender = rightSelectedPlayingPiece;
             ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
             switch (attacker.PlayingPieceType)
@@ -518,19 +588,6 @@ public class Board : MonoBehaviour
                     break;
             }
             enemyAttacked = true;
-        }
-        // if prior left selected playing piece and right selected castle
-        else if (formerLeftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= formerLeftSelectedPlayingPiece.Info.PointsForAttack)
-        {
-            ActivePlayer.PointsLeft -= formerLeftSelectedPlayingPiece.Info.PointsForAttack;
-            var attacker = formerLeftSelectedPlayingPiece;
-            var defender = rightSelectedCaste;
-            ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
-            if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
-            {
-                ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
-                enemyAttacked = true;
-            }
         }
         return enemyAttacked;
     }

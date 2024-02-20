@@ -45,32 +45,42 @@ public class Player : MonoBehaviour
         // 2. TODO: show 'thinking...' above castle
 
         // 3. get playing pieces and castle for ai player
-        var units = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId == PlayerId).ToList();
-        var castle = GameTiles.Instance.CastleTiles.Values.First(c => c.Player.PlayerId == PlayerId);
-        var enemyUnits = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId != PlayerId).ToList();
-        var enemyCastle = GameTiles.Instance.CastleTiles.Values.First(c => c.Player.PlayerId != PlayerId);
+        List<PlayingPieceTile> units, enemyUnits;
+        CastleTile castle, enemyCastle;
+        GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
 
         // 4. if no playing piece found on board or sometimes, select castle and spawn unit
         if (units.Count == 0 || Random.Range(0, 5) == 0)
         {
             yield return StartCoroutine(SpawnUnit(board, castle, units, enemyCastle, enemyUnits));
-            units = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId == PlayerId).ToList();
+            GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
         }
 
         // 5. attack enemy castle if possible, then try to attack some other enemy unit
         yield return StartCoroutine(TryToAttack(board, castle, units, enemyCastle, enemyUnits));
+        GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
 
         // 6. move any unit
         yield return StartCoroutine(MoveAnyUnit(board, castle, units, enemyCastle, enemyUnits));
+        GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
 
         // 7. attack enemy castle if possible, then try to attack some other enemy unit
         yield return StartCoroutine(TryToAttack(board, castle, units, enemyCastle, enemyUnits));
+        GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
 
         // 8. end round if not already happend
         if (board.ActivePlayer.IsAi)
             board.ButtonEndTurn.onClick.Invoke();
 
         Thinking = false;
+    }
+
+    private void GetPlayingPieces(out List<PlayingPieceTile> units, out CastleTile castle, out List<PlayingPieceTile> enemyUnits, out CastleTile enemyCastle)
+    {
+        units = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId == PlayerId).ToList();
+        castle = GameTiles.Instance.CastleTiles.Values.First(c => c.Player.PlayerId == PlayerId);
+        enemyUnits = GameTiles.Instance.PlayingPieceTiles.Values.Where(t => t.Player.PlayerId != PlayerId).ToList();
+        enemyCastle = GameTiles.Instance.CastleTiles.Values.First(c => c.Player.PlayerId != PlayerId);
     }
 
     private IEnumerator MoveAnyUnit(Board board, CastleTile castle, List<PlayingPieceTile> units, CastleTile enemyCastle, List<PlayingPieceTile> enemyUnits)
@@ -80,7 +90,7 @@ public class Player : MonoBehaviour
 
         // select random unit
         var anyUnit = units[Random.Range(0, units.Count-1)];
-        board.DoLeftClick(anyUnit);
+        board.SimulateLeftClick(anyUnit);
         yield return new WaitForSeconds(1f);
 
         // try to move unit to random tile
@@ -105,7 +115,7 @@ public class Player : MonoBehaviour
                     else
                     {
                         // if new position is closer to enemy castle then go but wait a little
-                        board.DoLeftClick(tile);
+                        board.SimulateLeftClick(tile);
                         // wait until movement finished
                         while (board.AnimationRunning)
                             yield return new WaitForSeconds(1f);
@@ -123,7 +133,7 @@ public class Player : MonoBehaviour
     private IEnumerator SpawnUnit(Board board, CastleTile castle, List<PlayingPieceTile> units, CastleTile enemyCastle, List<PlayingPieceTile> enemyUnits)
     {
         // select castle
-        board.DoLeftClick(castle);
+        board.SimulateLeftClick(castle);
         yield return new WaitForSeconds(1f);
         // select unit type in popup
         var randomUnitType = (PlayingPieceTileType)Random.Range(0, Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max());
@@ -142,9 +152,9 @@ public class Player : MonoBehaviour
             foreach (var unit in units)
             {
                 // select unit
-                board.DoLeftClick(unit);
+                board.SimulateLeftClick(unit);
                 // if castle in range attack
-                if (board.DoRightClick(enemyCastle))
+                if (board.SimulateRightClick(enemyCastle))
                 {
                     enemyInAttackRangeFound = true;
                     while (board.FightBoardShowing)
@@ -156,7 +166,7 @@ public class Player : MonoBehaviour
                     foreach (var enemyUnit in enemyUnits)
                     {
                         // if enemy in range attack
-                        if (board.DoRightClick(enemyUnit))
+                        if (board.SimulateRightClick(enemyUnit))
                         {
                             enemyInAttackRangeFound = true;
                             while (board.FightBoardShowing)
@@ -168,7 +178,7 @@ public class Player : MonoBehaviour
                         yield break;
                 }
                 // deselect unit if not attacked, otherwise we break
-                board.DoLeftClick(unit);
+                board.SimulateLeftClick(unit);
             }
         }
     }
