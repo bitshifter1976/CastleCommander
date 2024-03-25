@@ -143,7 +143,7 @@ public class FightBoard : MonoBehaviour
                         }
                     }
                     UpdateInfo();
-                    CloseButton.gameObject.SetActive(true);
+                    //CloseButton.gameObject.SetActive(true);
                     State = FightBoardState.WaitForClose;
                     break;
                 }

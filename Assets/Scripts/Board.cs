@@ -337,16 +337,17 @@ public class Board : MonoBehaviour
     {
         if (GeneratorMode == BoardMode.WholeBoard)
         {
-            var xMin = -BoardWidth / 2;
-            var xMax = BoardWidth / 2;
-            var yMin = -BoardHeight / 2;
-            var yMax = BoardHeight / 2;
+            var border = 4;
+            var xMin = -BoardWidth / 2 - border;
+            var xMax = BoardWidth / 2 + border;
+            var yMin = -BoardHeight / 2 - border;
+            var yMax = BoardHeight / 2 + border;
             // add landscape tiles with its' under tiles
             for (var x = xMin; x <= xMax; x++)
             {
                 for (var y = yMax; y >= yMin; y--)
                 {
-                    var landscapeTile = GameTiles.Instance.GetRandomLandscapeTile();
+                    var landscapeTile = (x >= -BoardWidth / 2 && x <= BoardWidth / 2) && (y >= -BoardHeight / 2 && y <= BoardHeight / 2) ? GameTiles.Instance.GetRandomLandscapeTile() : GameTiles.Instance.Ocean;
                     var position = new Vector3Int(x, y, 0);
                     tilesLandscape.Add(position, landscapeTile);
                     tilesUnderTiles.Add(position, landscapeTile == GameTiles.Instance.Ocean ? GameTiles.Instance.UnderOcean : GameTiles.Instance.UnderDirt);
@@ -354,10 +355,10 @@ public class Board : MonoBehaviour
                 }
             }
             // add player castle tiles
-            var x1 = xMin + 1;
-            var x2 = xMax - 1;
-            var y1 = Random.Range(yMin, yMax);
-            var y2 = Random.Range(yMin, yMax);
+            var x1 = -BoardWidth / 2 + 1;
+            var x2 = BoardWidth / 2 - 1;
+            var y1 = Random.Range(-BoardHeight / 2, BoardHeight / 2);
+            var y2 = Random.Range(-BoardHeight / 2, BoardHeight / 2);
             var pos1 = new Vector3Int(x1, y1, 0);
             var pos2 = new Vector3Int(x2, y2, 0);
             tilesLandscape[pos1] = GameTiles.Instance.Castle1;
