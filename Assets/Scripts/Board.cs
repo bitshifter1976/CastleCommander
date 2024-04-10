@@ -511,23 +511,9 @@ public class Board : MonoBehaviour
         // get selected game tiles
         var rightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.RightSelectedPlayingPiecePosition);
         var rightSelectedCaste = GameTiles.Instance.Get<CastleTile>(MouseHandler.RightSelectedLandscapeTilePosition);
-        // if prior left selected playing piece and right selected castle
-        if (leftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
-        {
-            ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
-            var attacker = leftSelectedPlayingPiece;
-            var defender = rightSelectedCaste;
-            ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
-            if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
-            {
-                //ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
-                return true;
-            }
-        }
         // if left selected playing piece and right selected playing piece
-        else if (leftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
+        if (leftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && rightSelectedCaste.BoardPosition != rightSelectedPlayingPiece.BoardPosition && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
         {
-            ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
             var attacker = leftSelectedPlayingPiece;
             var defender = rightSelectedPlayingPiece;
             ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
@@ -538,13 +524,31 @@ public class Board : MonoBehaviour
                 case PlayingPieceTile.PlayingPieceTileType.Infantry:
                     // if defender in attack range, do attack
                     if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                    {
+                        ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
                         return true;
+                    }
                     break;
                 case PlayingPieceTile.PlayingPieceTileType.Medic:
                     // if attacker next to defender, do healing
                     if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId == ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                    {
+                        ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
                         return false;
+                    }
                     break;
+            }
+        }
+        // if prior left selected playing piece and right selected castle
+        else if (leftSelectedPlayingPiece != null && rightSelectedCaste != null && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
+        {
+            var attacker = leftSelectedPlayingPiece;
+            var defender = rightSelectedCaste;
+            ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
+            if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+            {
+                ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
+                return true;
             }
         }
         return false;
@@ -557,9 +561,8 @@ public class Board : MonoBehaviour
         var rightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseHandler.RightSelectedPlayingPiecePosition);
         var rightSelectedCaste = GameTiles.Instance.Get<CastleTile>(MouseHandler.RightSelectedLandscapeTilePosition);
         // if left selected playing piece and right selected playing piece
-        if (leftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
+        if (leftSelectedPlayingPiece != null && rightSelectedPlayingPiece != null && rightSelectedCaste.BoardPosition != rightSelectedPlayingPiece.BoardPosition && ActivePlayer.PointsLeft >= leftSelectedPlayingPiece.Info.PointsForAttack)
         {
-            ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
             var attacker = leftSelectedPlayingPiece;
             var defender = rightSelectedPlayingPiece;
             ActivePlayer.Distance = GetDistance(attacker.BoardPosition, defender.BoardPosition);
@@ -571,6 +574,7 @@ public class Board : MonoBehaviour
                     // if defender in attack range, do attack
                     if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId != ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
                     {
+                        ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
                         attacker.Animation = PlayingPieceTile.AnimationType.Attack;
                         defender.Animation = PlayingPieceTile.AnimationType.GetHit;
                         ShowFightBoard(attacker, defender, ActivePlayer.Distance > 2);
@@ -579,7 +583,10 @@ public class Board : MonoBehaviour
                 case PlayingPieceTile.PlayingPieceTileType.Medic:
                     // if attacker next to defender, do healing
                     if (attacker.Player.PlayerId == ActivePlayer.PlayerId && defender.Player.PlayerId == ActivePlayer.PlayerId && ActivePlayer.Distance <= attacker.Info.DistanceForAttack)
+                    {
+                        ActivePlayer.PointsLeft -= leftSelectedPlayingPiece.Info.PointsForAttack;
                         HealPlayingPiece(attacker, defender);
+                    }
                     break;
             }
             enemyAttacked = true;

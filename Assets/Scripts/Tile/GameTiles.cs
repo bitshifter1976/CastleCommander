@@ -187,7 +187,6 @@ public class GameTiles : MonoBehaviour
         var prefab = AssetDatabase.LoadAssetAtPath($"Assets/Prefabs/{prefabName}.prefab", typeof(GameObject));
         var pos = tilemap.CellToWorld(boardPosition);
         var clone = Instantiate(prefab, pos, Quaternion.identity) as GameObject;
-        clone.transform.Rotate(0, player.PlayerId == 1 ? 145 : 235, 0);
 
         return clone;
     }

@@ -51,7 +51,7 @@ public class PlayingPieceTile : GameTile
         set
         {
             animationType = value;
-            animator.SetTrigger(animationType.ToString());
+            animator.Play(animationType.ToString());
         }
     }
 
@@ -64,5 +64,6 @@ public class PlayingPieceTile : GameTile
         BoardPosition = boardPosition;
         animator = PlayingPiece.GetComponent<Animator>();
         animationType = AnimationType.Idle;
+        PlayingPiece.transform.Rotate(0, player.PlayerId == 1 ? 90 : 270, 0);
     }
 }
