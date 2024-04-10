@@ -5,7 +5,6 @@ public class LandscapeTile : GameTile
 {
     public enum LandscapeTileType
     {
-        None,
         Base,
         Desert,
         LeafForest,

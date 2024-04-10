@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using static PlayingPieceTile;
@@ -111,7 +112,7 @@ public class GameTiles : MonoBehaviour
         else if (landscapeTile == Volcano)
             return LandscapeTile.LandscapeTileType.Volcano;
 
-        return LandscapeTile.LandscapeTileType.None;
+        return LandscapeTile.LandscapeTileType.Base;
     }
 
     public Tile GetRandomLandscapeTile()
@@ -124,18 +125,16 @@ public class GameTiles : MonoBehaviour
         return possibleTiles[Random.Range(0, possibleTiles.Count - 1)];
     }
 
-    public PlayingPieceTile Move(PlayingPieceTile tile, Vector3Int newPosition)
+    public void Move(PlayingPieceTile tile, Vector3Int newPosition)
     {
         if (tile != null && PlayingPieceTiles.ContainsKey(tile.BoardPosition))
         {
-            PlayingPieceTiles.Remove(tile.BoardPosition);
             LandscapeTiles[tile.BoardPosition].Movable = true;
-            var newTile = new PlayingPieceTile(newPosition, tile.Tile, tile.Info, tile.Tilemap, tile.Id, tile.Tile.color, tile.PlayingPieceType, tile.Player, false, tile.MovementCost);
-            PlayingPieceTiles.TryAdd(newPosition, newTile);
             LandscapeTiles[newPosition].Movable = false;
-            return newTile;
+            PlayingPieceTiles.Remove(tile.BoardPosition);
+            PlayingPieceTiles.Add(newPosition, tile);
+            tile.BoardPosition = newPosition;
         }
-        return null;
     }
 
     public GameTile Add(
@@ -147,32 +146,50 @@ public class GameTiles : MonoBehaviour
         CastleTileInfo tileInfo3,
         Tilemap tilemap,
         Player player, 
-        PlayingPieceTile.PlayingPieceTileType playingPieceType = PlayingPieceTile.PlayingPieceTileType.None, 
-        LandscapeTile.LandscapeTileType landscapeType = LandscapeTile.LandscapeTileType.None)
+        PlayingPieceTile.PlayingPieceTileType? playingPieceType, 
+        LandscapeTile.LandscapeTileType? landscapeType)
     {
         switch (type)
         {
             case GameTile.TileType.Castle:
-                if (CastleTiles.ContainsKey(boardPosition))
-                    CastleTiles[boardPosition] = new CastleTile(boardPosition, tile, tileInfo3, tilemap, CastleTiles[boardPosition].Id, tileInfo.Tile.color, player, true, tileInfo.MovementCosts);
-                else
-                    CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tileInfo3, tilemap, NewId(), tileInfo.Tile.color, player, true, tileInfo.MovementCosts));
+                CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tileInfo3, tilemap, NewId(), tileInfo.Tile.color, player, true, tileInfo.MovementCosts));
                 return CastleTiles[boardPosition];
             case GameTile.TileType.Landscape:
-                if (LandscapeTiles.ContainsKey(boardPosition))
-                    LandscapeTiles[boardPosition] = new LandscapeTile(boardPosition, tile, tilemap, LandscapeTiles[boardPosition].Id, tileInfo.Tile.color, landscapeType, TilesForMovement.Contains(tileInfo.Tile), tileInfo.MovementCosts);
-                else
-                    LandscapeTiles.Add(boardPosition, new LandscapeTile(boardPosition, tile, tilemap, NewId(), tileInfo.Tile.color, landscapeType, TilesForMovement.Contains(tileInfo.Tile), tileInfo.MovementCosts));
+                LandscapeTiles.Add(boardPosition, new LandscapeTile(boardPosition, tile, tilemap, NewId(), tileInfo.Tile.color, landscapeType.Value, TilesForMovement.Contains(tileInfo.Tile), tileInfo.MovementCosts));
                 return LandscapeTiles[boardPosition];
             case GameTile.TileType.PlayingPiece:
-                if (PlayingPieceTiles.ContainsKey(boardPosition))
-                    PlayingPieceTiles[boardPosition] = new PlayingPieceTile(boardPosition, tile, tileInfo2, tilemap, PlayingPieceTiles[boardPosition].Id, player.Color, playingPieceType, player, false, 0);
-                else
-                    PlayingPieceTiles.Add(boardPosition, new PlayingPieceTile(boardPosition, tile, tileInfo2, tilemap, NewId(), player.Color, playingPieceType, player, false, 0));
+                var newPlayingPiece = CreatePlayingPiece(boardPosition, player, playingPieceType.Value, tilemap);
+                PlayingPieceTiles.Add(boardPosition, new PlayingPieceTile(boardPosition, newPlayingPiece, tile, tileInfo2, tilemap, NewId(), player.Color, playingPieceType.Value, player, false, 0));
                 return PlayingPieceTiles[boardPosition];
             default: 
                 return null;
         }
+    }
+
+    private static GameObject CreatePlayingPiece(Vector3Int boardPosition, Player player, PlayingPieceTileType playingPieceType, Tilemap tilemap)
+    {
+        var prefabName = string.Empty;
+        switch (playingPieceType)
+        {
+            case PlayingPieceTileType.Artillery:
+                prefabName = (player.PlayerId == 1) ? "Archer_MaskTint_PBR" : "Archer_Standard_PBR";
+                break;
+            case PlayingPieceTileType.Cavalry:
+                prefabName = (player.PlayerId == 1) ? "Horseman_MaskTint_PBR" : "Horseman_Standard_PBR";
+                break;
+            case PlayingPieceTileType.Infantry:
+                prefabName = (player.PlayerId == 1) ? "Footman_MaskTint_PBR" : "Footman_Standard_PBR";
+                break;
+            case PlayingPieceTileType.Medic:
+                prefabName = (player.PlayerId == 1) ? "Mage_MaskTint_PBR" : "Mage_Standard_PBR";
+                break;
+        }
+        var prefab = AssetDatabase.LoadAssetAtPath($"Assets/Prefabs/{prefabName}.prefab", typeof(GameObject));
+        var pos = tilemap.CellToWorld(boardPosition);
+        var clone = Instantiate(prefab, pos, Quaternion.identity) as GameObject;
+        clone.transform.Rotate(0, player.PlayerId == 1 ? 145 : 235, 0);
+
+        return clone;
     }
 
     public void Delete(GameTile tile)
@@ -188,6 +205,7 @@ public class GameTiles : MonoBehaviour
                 break;
             case GameTile.TileType.PlayingPiece:
                 PlayingPieceTiles.Remove(tile.BoardPosition);
+                Destroy(((PlayingPieceTile)tile).PlayingPiece);
                 break;
         }
     }

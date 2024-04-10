@@ -10,12 +10,12 @@ public class MouseHandler : MonoBehaviour
     public Tilemap TilemapLandscape; 
     public Tilemap TilemapPlayingPieces;
 
-    public Tile MouseOverLandscapeTile;
-    public Tile MouseOverPlayingPiece;
-    public Tile LeftSelectedLandscapeTile;
-    public Tile LeftSelectedPlayingPiece;
-    public Tile RightSelectedLandscapeTile;
-    public Tile RightSelectedPlayingPiece;
+    public GameTile MouseOverLandscapeTile;
+    public GameTile MouseOverPlayingPiece;
+    public GameTile LeftSelectedLandscapeTile;
+    public GameTile LeftSelectedPlayingPiece;
+    public GameTile RightSelectedLandscapeTile;
+    public GameTile RightSelectedPlayingPiece;
 
     public Vector3Int MouseOverLandscapeTilePosition;
     public Vector3Int MouseOverPlayingPiecePosition;
@@ -31,21 +31,21 @@ public class MouseHandler : MonoBehaviour
     {
         var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         MouseOverPlayingPiecePosition = TilemapPlayingPieces.WorldToCell(mousePos);
-        MouseOverPlayingPiece = TilemapPlayingPieces.GetTile<Tile>(MouseOverPlayingPiecePosition);
+        MouseOverPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(MouseOverPlayingPiecePosition);
         MouseOverLandscapeTilePosition = TilemapLandscape.WorldToCell(mousePos);
-        MouseOverLandscapeTile = TilemapLandscape.GetTile<Tile>(MouseOverLandscapeTilePosition);
+        MouseOverLandscapeTile = GameTiles.Instance.Get<LandscapeTile>(MouseOverLandscapeTilePosition);
 
         if (Input.GetMouseButtonDown(0))
         {
             if (MouseOverPlayingPiece != null)
             {
                 LeftSelectedPlayingPiecePosition = MouseOverPlayingPiecePosition;
-                LeftSelectedPlayingPiece = TilemapPlayingPieces.GetTile<Tile>(LeftSelectedPlayingPiecePosition);
+                LeftSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(LeftSelectedPlayingPiecePosition);
             }
             if (MouseOverLandscapeTile != null)
             {
                 LeftSelectedLandscapeTilePosition = MouseOverLandscapeTilePosition;
-                LeftSelectedLandscapeTile = TilemapLandscape.GetTile<Tile>(LeftSelectedLandscapeTilePosition);
+                LeftSelectedLandscapeTile = GameTiles.Instance.Get<LandscapeTile>(LeftSelectedLandscapeTilePosition);
             }
             if (OnLeftClick != null)
                 OnLeftClick(this, new EventArgs());
@@ -55,12 +55,12 @@ public class MouseHandler : MonoBehaviour
             if (MouseOverPlayingPiece != null)
             {
                 RightSelectedPlayingPiecePosition = MouseOverPlayingPiecePosition;
-                RightSelectedPlayingPiece = TilemapPlayingPieces.GetTile<Tile>(RightSelectedPlayingPiecePosition);
+                RightSelectedPlayingPiece = GameTiles.Instance.Get<PlayingPieceTile>(RightSelectedPlayingPiecePosition);
             }
             if (MouseOverLandscapeTile != null)
             {
                 RightSelectedLandscapeTilePosition = MouseOverLandscapeTilePosition;
-                RightSelectedLandscapeTile = TilemapLandscape.GetTile<Tile>(RightSelectedLandscapeTilePosition);
+                RightSelectedLandscapeTile = GameTiles.Instance.Get<LandscapeTile>(RightSelectedLandscapeTilePosition);
             }
             if (OnRightClick != null)
                 OnRightClick(this, new EventArgs());

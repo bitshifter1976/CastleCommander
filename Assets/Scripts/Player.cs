@@ -50,7 +50,8 @@ public class Player : MonoBehaviour
         GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
 
         // 4. if no playing piece found on board or sometimes, select castle and spawn unit
-        if (units.Count == 0 || Random.Range(0, 5) == 0)
+        var unitOnCastleTile = units.Any(u => u.BoardPosition == castle.BoardPosition);
+        if (!unitOnCastleTile && (units.Count == 0 || Random.Range(0, 5) == 0))
         {
             yield return StartCoroutine(SpawnUnit(board, castle, units, enemyCastle, enemyUnits));
             GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);

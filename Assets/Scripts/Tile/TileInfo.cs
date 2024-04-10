@@ -1,4 +1,6 @@
-﻿using UnityEngine.Tilemaps;
+﻿using UnityEditor;
+using UnityEngine;
+using UnityEngine.Tilemaps;
 using static PlayingPieceTile;
 
 public class LandscapeTileInfo
@@ -23,6 +25,7 @@ public class LandscapeTileInfo
 public class PlayingPieceTileInfo
 {
     public PlayingPieceTileType PlayingPieceType;
+    public GameObject PlayingPiece;
     public int Attack;
     public int Defense;
     public int Speed;

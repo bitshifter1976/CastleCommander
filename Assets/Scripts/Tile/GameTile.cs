@@ -12,7 +12,7 @@ public class GameTile
         PlayingPiece
     }
 
-    public Vector3Int BoardPosition;
+    public virtual Vector3Int BoardPosition { get; set; }
 
     public Tile Tile;
 

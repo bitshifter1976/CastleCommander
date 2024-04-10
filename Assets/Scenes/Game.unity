@@ -8345,12 +8345,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TilemapLandscape: {fileID: 45378808}
   TilemapPlayingPieces: {fileID: 1844251256}
-  MouseOverLandscapeTile: {fileID: 0}
-  MouseOverPlayingPiece: {fileID: 0}
-  LeftSelectedLandscapeTile: {fileID: 0}
-  LeftSelectedPlayingPiece: {fileID: 0}
-  RightSelectedLandscapeTile: {fileID: 0}
-  RightSelectedPlayingPiece: {fileID: 0}
   MouseOverLandscapeTilePosition: {x: 0, y: 0, z: 0}
   MouseOverPlayingPiecePosition: {x: 0, y: 0, z: 0}
   LeftSelectedLandscapeTilePosition: {x: 0, y: 0, z: 0}
@@ -11958,7 +11952,7 @@ MonoBehaviour:
   Player2: {fileID: 471920381}
   TilemapPlayingPieces: {fileID: 1844251256}
   TilemapPath: {fileID: 1040245605}
-  TilemapCastleSelect: {fileID: 920233463}
+  TilemapSelect: {fileID: 920233463}
   TilemapLandscape: {fileID: 45378808}
   TilemapUnderTiles: {fileID: 1120693687}
   MouseHandler: {fileID: 551012529}
@@ -11983,7 +11977,7 @@ MonoBehaviour:
   - {fileID: 1670868629}
   - {fileID: 1272208302}
   - {fileID: 213031937}
-  TimeToAddTileSec: 0.01
+  TimeToAddTileSec: 0
   TimeToEndRoundSec: 30
   TimeToMovePlayingPieceSec: 0.5
   AlphaSelected: 1
@@ -14149,7 +14143,7 @@ GameObject:
   - component: {fileID: 920233463}
   - component: {fileID: 920233462}
   m_Layer: 3
-  m_Name: Tilemap Castle Select
+  m_Name: Tilemap Select
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14234,7 +14228,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 2
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -14244,7 +14238,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 2
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -14264,7 +14258,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 2
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -14284,7 +14278,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 2
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -14324,11 +14318,11 @@ Tilemap:
   - m_RefCount: 2
     m_Data: {r: 1, g: 0.60391456, b: 0, a: 0.390625}
   - m_RefCount: 0
-    m_Data: {r: 3.4155e-41, g: 3.4155e-41, b: 3.4155e-41, a: 3.4155e-41}
+    m_Data: {r: 3.6767e-41, g: 3.6767e-41, b: 3.6767e-41, a: 3.6767e-41}
+  - m_RefCount: 0
+    m_Data: {r: 3.677e-41, g: 3.677e-41, b: 3.677e-41, a: 3.677e-41}
   - m_RefCount: 4
     m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
-  - m_RefCount: 0
-    m_Data: {r: 3.6708e-41, g: 3.6708e-41, b: 3.6708e-41, a: 3.6708e-41}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -17004,7 +16998,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 2
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -17014,7 +17008,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 2
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -17034,7 +17028,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 2
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -17054,7 +17048,7 @@ Tilemap:
       m_TileIndex: 1
       m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 2
+      m_TileColorIndex: 3
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -17094,11 +17088,11 @@ Tilemap:
   - m_RefCount: 2
     m_Data: {r: 1, g: 0.60391456, b: 0, a: 0.390625}
   - m_RefCount: 0
-    m_Data: {r: 3.4242e-41, g: 3.4242e-41, b: 3.4242e-41, a: 3.4242e-41}
+    m_Data: {r: 3.7059e-41, g: 3.7059e-41, b: 3.7059e-41, a: 3.7059e-41}
+  - m_RefCount: 0
+    m_Data: {r: 3.7062e-41, g: 3.7062e-41, b: 3.7062e-41, a: 3.7062e-41}
   - m_RefCount: 4
     m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
-  - m_RefCount: 0
-    m_Data: {r: 3.7e-41, g: 3.7e-41, b: 3.7e-41, a: 3.7e-41}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -20002,6 +19996,100 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1195595081}
   m_CullTransparentMesh: 1
+--- !u!1 &1199316307
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1199316309}
+  - component: {fileID: 1199316308}
+  m_Layer: 0
+  m_Name: Directional Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!108 &1199316308
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199316307}
+  m_Enabled: 1
+  serializedVersion: 10
+  m_Type: 1
+  m_Shape: 0
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+--- !u!4 &1199316309
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199316307}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalPosition: {x: 12.005244, y: 0.18085063, z: -0.8462264}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1211280227
 GameObject:
   m_ObjectHideFlags: 0
@@ -30859,7 +30947,7 @@ Tilemap:
       e33: 1
   m_TileColorArray:
   - m_RefCount: 0
-    m_Data: {r: 3.4752e-41, g: 3.4752e-41, b: 3.4752e-41, a: 3.4752e-41}
+    m_Data: {r: 3.8578e-41, g: 3.8578e-41, b: 3.8578e-41, a: 3.8578e-41}
   - m_RefCount: 2
     m_Data: {r: 1, g: 0.60391456, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
@@ -35203,6 +35291,7 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1199316309}
   - {fileID: 823977464}
   - {fileID: 23035386}
   - {fileID: 234897393}
