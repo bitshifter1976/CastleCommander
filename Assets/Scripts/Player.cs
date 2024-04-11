@@ -90,7 +90,7 @@ public class Player : MonoBehaviour
             yield break;
 
         // select random unit
-        var anyUnit = units[Random.Range(0, units.Count-1)];
+        var anyUnit = units[Random.Range(0, units.Count)];
         board.SimulateLeftClick(anyUnit);
         yield return new WaitForSeconds(1f);
 
@@ -104,7 +104,7 @@ public class Player : MonoBehaviour
             var possibleTiles = GameTiles.Instance.LandscapeTiles.Values.Where(t => t.Movable).ToList();
             if (possibleTiles.Count > 0)
             {
-                tile = possibleTiles[Random.Range(0, possibleTiles.Count - 1)];
+                tile = possibleTiles[Random.Range(0, possibleTiles.Count)];
                 if (board.ShowPath(tile.BoardPosition))
                 {
                     var oldDistance = board.GetDistance(enemyCastle.BoardPosition, anyUnit.BoardPosition);
@@ -137,7 +137,7 @@ public class Player : MonoBehaviour
         board.SimulateLeftClick(castle);
         yield return new WaitForSeconds(1f);
         // select unit type in popup
-        var randomUnitType = (PlayingPieceTileType)Random.Range(0, Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max());
+        var randomUnitType = (PlayingPieceTileType)Random.Range(0, Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max()+1);
         board.DoSelectUnitType(randomUnitType);
         yield return new WaitForSeconds(1f);
     }

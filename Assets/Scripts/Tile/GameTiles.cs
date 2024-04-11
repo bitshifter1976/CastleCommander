@@ -38,11 +38,11 @@ public class GameTiles : MonoBehaviour
 
     private void Start()
     {
+        LandscapeTileInfos = GetLandscapeTileInfos();
+        PlayingPieceTileInfos = GetPlayingPieceTileInfos();
+        CastleTileInfo = GetCastleTileInfo();
+        TilesForMovement = GetLandscapeTilesForMovement();
         Instance = this;
-        Instance.LandscapeTileInfos = GetLandscapeTileInfos();
-        Instance.PlayingPieceTileInfos = GetPlayingPieceTileInfos();
-        Instance.CastleTileInfo = GetCastleTileInfo();
-        Instance.TilesForMovement = GetLandscapeTilesForMovement();
     }
 
     private List<PlayingPieceTileInfo> GetPlayingPieceTileInfos()
@@ -70,11 +70,11 @@ public class GameTiles : MonoBehaviour
             new LandscapeTileInfo(LeafForest,    0.5f,   20),
             new LandscapeTileInfo(Desert,        0.5f,   30),
             new LandscapeTileInfo(Jungle,        0.5f,   30),
-            new LandscapeTileInfo(Mountain,      0.4f,   100),
-            new LandscapeTileInfo(Ocean,         0.4f,   100),
+            new LandscapeTileInfo(Mountain,      0.4f,  100),
+            new LandscapeTileInfo(Ocean,         0.4f,  100),
             new LandscapeTileInfo(Base,          0.2f,   10),
             new LandscapeTileInfo(PineForest,    0.2f,   20),
-            new LandscapeTileInfo(Volcano,       0.05f,  100)
+            new LandscapeTileInfo(Volcano,       0.1f, 100)
         };
     }
 
@@ -121,8 +121,8 @@ public class GameTiles : MonoBehaviour
         var tiles = GetLandscapeTileInfos();
         var possibleTiles = tiles.Where(t => t.Probability >= probability).Select(s => s.Tile).ToList();
         if (possibleTiles.Count == 0)
-            possibleTiles.Add(tiles[Random.Range(0, tiles.Count - 1)].Tile);
-        return possibleTiles[Random.Range(0, possibleTiles.Count - 1)];
+            possibleTiles.Add(tiles[Random.Range(0, tiles.Count)].Tile);
+        return possibleTiles[Random.Range(0, possibleTiles.Count)];
     }
 
     public void Move(PlayingPieceTile tile, Vector3Int newPosition)
@@ -240,5 +240,12 @@ public class GameTiles : MonoBehaviour
     public int NewId()
     {
         return ++LastId;
+    }
+
+    public void Clear()
+    {
+        CastleTiles.Clear();
+        PlayingPieceTiles.Clear();
+        LandscapeTiles.Clear();
     }
 }

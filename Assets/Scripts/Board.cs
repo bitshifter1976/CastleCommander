@@ -344,6 +344,9 @@ public class Board : MonoBehaviour
         TilemapSelect.ClearAllTiles();
         TilemapLandscape.ClearAllTiles();
         TilemapUnderTiles.ClearAllTiles();
+        tilesLandscape.Clear();
+        tilesUnderTiles.Clear();
+        GameTiles.Instance.Clear();
         Player1.PointsLeft = 0;
         Player1.SpawnsLeft = 8;
         Player1.Distance = 0;
@@ -378,8 +381,8 @@ public class Board : MonoBehaviour
             // add player castle tiles
             var x1 = -BoardWidth / 2 + 1;
             var x2 = BoardWidth / 2 - 1;
-            var y1 = Random.Range(-BoardHeight / 2, BoardHeight / 2);
-            var y2 = Random.Range(-BoardHeight / 2, BoardHeight / 2);
+            var y1 = Random.Range(-BoardHeight / 2 + 1, BoardHeight / 2);
+            var y2 = Random.Range(-BoardHeight / 2 + 1, BoardHeight / 2);
             var pos1 = new Vector3Int(x1, y1, 0);
             var pos2 = new Vector3Int(x2, y2, 0);
             tilesLandscape[pos1] = GameTiles.Instance.Castle1;
