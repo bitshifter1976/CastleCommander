@@ -33,7 +33,7 @@ public class MusicPlayer : MonoBehaviour
     public void PlayRandomMusic()
     {
         SliderVolume.value = Audio.volume;
-        Audio.clip = Music[Random.Range(0, Music.Length-1)];
+        Audio.clip = Music[Random.Range(0, Music.Length)];
         Audio.Play();
     }
 
