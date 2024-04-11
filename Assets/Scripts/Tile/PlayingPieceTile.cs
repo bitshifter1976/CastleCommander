@@ -51,7 +51,7 @@ public class PlayingPieceTile : GameTile
         set
         {
             animationType = value;
-            animator.Play(animationType.ToString());
+            animator.Play(animationType.ToString(), 0);
         }
     }
 

@@ -7393,7 +7393,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c152d46e0181ae247bd918de575a5615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsAi: 1
+  IsAi: 0
   PlayerId: 2
   Color: {r: 0, g: 0.7210524, b: 1, a: 1}
   ColorInactive: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 1}
@@ -14320,7 +14320,7 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {r: 3.6767e-41, g: 3.6767e-41, b: 3.6767e-41, a: 3.6767e-41}
   - m_RefCount: 4
-    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
+    m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
   - m_RefCount: 0
     m_Data: {r: 3.6764e-41, g: 3.6764e-41, b: 3.6764e-41, a: 3.6764e-41}
   m_TileObjectToInstantiateArray: []
@@ -17090,7 +17090,7 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {r: 3.7059e-41, g: 3.7059e-41, b: 3.7059e-41, a: 3.7059e-41}
   - m_RefCount: 4
-    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
+    m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
   - m_RefCount: 0
     m_Data: {r: 3.7056e-41, g: 3.7056e-41, b: 3.7056e-41, a: 3.7056e-41}
   m_TileObjectToInstantiateArray: []
