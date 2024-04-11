@@ -258,12 +258,12 @@ public class Board : MonoBehaviour
                             if (FightBoard.Tile1 is PlayingPieceTile t && t.Info.Energy <= 0)
                             {
                                 t.Animation = AnimationType.Death;
-                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile1));
+                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile1, 5f));
                             }
                             else if (FightBoard.Tile2 is PlayingPieceTile t2 && t2.Info.Energy <= 0)
                             {
                                 t2.Animation = AnimationType.Death;
-                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile2));
+                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile2, 5f));
                             }
                             else if (FightBoard.Tile2 is CastleTile c && c.Info.Energy <= 0)
                             {
@@ -330,9 +330,9 @@ public class Board : MonoBehaviour
         }
     }
 
-    private IEnumerator DoDeleteAfterTime(GameTile tile)
+    private IEnumerator DoDeleteAfterTime(GameTile tile, float timeSec)
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(timeSec);
         GameTiles.Instance.Delete(tile);
     }
 
