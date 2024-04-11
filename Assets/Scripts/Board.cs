@@ -29,6 +29,7 @@ public class Board : MonoBehaviour
         PlayRound,
         FinishRound,
         GameEnd,
+        GameReload,
         GameClose
     }
 
@@ -254,17 +255,21 @@ public class Board : MonoBehaviour
                                 playingPiece.Animation = AnimationType.Idle;
                             if (FightBoard.Tile2 is PlayingPieceTile playingPiece2)
                                 playingPiece2.Animation = AnimationType.Idle;
-                            if (FightBoard.Tile1 is PlayingPieceTile t && !t.Info.IsAttacker && t.Info.Energy <= 0)
+                            if (FightBoard.Tile1 is PlayingPieceTile t && t.Info.Energy <= 0)
                             {
-                                GameTiles.Instance.Delete(FightBoard.Tile1);
+                                t.Animation = AnimationType.Death;
+                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile1));
                             }
-                            else if (FightBoard.Tile2 is PlayingPieceTile t2 && !t2.Info.IsAttacker && t2.Info.Energy <= 0)
+                            else if (FightBoard.Tile2 is PlayingPieceTile t2 && t2.Info.Energy <= 0)
                             {
-                                GameTiles.Instance.Delete(FightBoard.Tile2);
+                                t2.Animation = AnimationType.Death;
+                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile2));
                             }
                             else if (FightBoard.Tile2 is CastleTile c && c.Info.Energy <= 0)
                             {
                                 GameTiles.Instance.Delete(FightBoard.Tile2);
+                                var winningUnits = GameTiles.Instance.PlayingPieceTiles.Where(p => p.Value.Player.PlayerId != c.Player.PlayerId).ToList();
+                                winningUnits.ForEach(p => p.Value.Animation = AnimationType.Victory);
                                 State = BoardState.GameEnd;
                             }
                         }
@@ -309,7 +314,12 @@ public class Board : MonoBehaviour
                 }
             case BoardState.GameEnd:
                 {
-                    ShowMessageBox($"player {ActivePlayer.PlayerId} won the game!{Environment.NewLine}do you want to load a new game?", "yes", "no", BoardState.Load, BoardState.GameClose);
+                    ShowMessageBox($"player {ActivePlayer.PlayerId} won the game!", "ok", null, BoardState.GameReload);
+                    break;
+                }
+            case BoardState.GameReload:
+                {
+                    ShowMessageBox($"do you want to load a new game?", "yes", "no", BoardState.Load, BoardState.GameClose);
                     break;
                 }
             case BoardState.GameClose:
@@ -318,6 +328,12 @@ public class Board : MonoBehaviour
                     break;
                 }
         }
+    }
+
+    private IEnumerator DoDeleteAfterTime(GameTile tile)
+    {
+        yield return new WaitForSeconds(5);
+        GameTiles.Instance.Delete(tile);
     }
 
     public void LoadBoard()
