@@ -75,6 +75,7 @@ public class Board : MonoBehaviour
     public float TimeToAddTileSec = 0.01f;
     public float TimeToEndRoundSec = 30f;
     public float TimeToMovePlayingPieceSec = 0.1f;
+    public float TimeToDeleteDeadPlayingPieceSec = 5f;
     [Header("Playing piece")]
     public float AlphaSelected = 1f;
     public float AlphaUnselected = 100f/256f;
@@ -83,6 +84,7 @@ public class Board : MonoBehaviour
     public Player ActivePlayer;
     public BoardState State = BoardState.Load;
     [Header("Playing piece movement")]
+    public int MovementLineSegmentCount = 2;
     public List<Vector3Int> MovementPath;
     public Vector3Int[] MovementDirectionsOdd  = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
     public Vector3Int[] MovementDirectionsEven = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(-1, 1, 0)/*top-left*/, new Vector3Int(0, 1, 0)/*top-right*/, new Vector3Int(-1, -1, 0)/*bottom-left*/, new Vector3Int(0, -1, 0)/*bottom-right*/ };
@@ -258,12 +260,12 @@ public class Board : MonoBehaviour
                             if (FightBoard.Tile1 is PlayingPieceTile t && t.Info.Energy <= 0)
                             {
                                 t.Animation = AnimationType.Death;
-                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile1, 5f));
+                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile1, TimeToDeleteDeadPlayingPieceSec));
                             }
                             else if (FightBoard.Tile2 is PlayingPieceTile t2 && t2.Info.Energy <= 0)
                             {
                                 t2.Animation = AnimationType.Death;
-                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile2, 5f));
+                                StartCoroutine(DoDeleteAfterTime(FightBoard.Tile2, TimeToDeleteDeadPlayingPieceSec));
                             }
                             else if (FightBoard.Tile2 is CastleTile c && c.Info.Energy <= 0)
                             {
@@ -745,45 +747,56 @@ public class Board : MonoBehaviour
 
     private void MovePlayingPiece()
     {
-        if (MovementPath.Count > 0 && formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.BoardPosition != null)
-        {
-            SoundPlayer.Instance.Play("Marching");
-            AnimationRunning = true;
-            StartCoroutine(MoveFormerSelectedPlayingPiece());
-        }
+        StartCoroutine(DoMoveFormerSelectedPlayingPiece());
     }
 
-    IEnumerator MoveFormerSelectedPlayingPiece()
+    IEnumerator DoMoveFormerSelectedPlayingPiece()
     {
-        var movementCosts = GameTiles.Instance.LandscapeTiles.Values.Where(t => MovementPath.Contains(t.BoardPosition)).Sum(t => t.MovementCost);
-        var costs = CalcualteMovementCosts(movementCosts, formerLeftSelectedPlayingPiece.Info.Speed);
-        if (costs <= ActivePlayer.PointsLeft)
+        if (MovementPath.Count > 0 && formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.BoardPosition != null)
         {
-            // animate playing piece
-            formerLeftSelectedPlayingPiece.Animation = PlayingPieceTile.AnimationType.Walk;
-            while (MovementPath.Count > 0)
+            AnimationRunning = true;
+            var movementCosts = GameTiles.Instance.LandscapeTiles.Values.Where(t => MovementPath.Contains(t.BoardPosition)).Sum(t => t.MovementCost);
+            var costs = CalcualteMovementCosts(movementCosts, formerLeftSelectedPlayingPiece.Info.Speed);
+            if (costs <= ActivePlayer.PointsLeft)
             {
-                // get next position
-                var position = MovementPath[0];
-                MovementPath.RemoveAt(0);
-                // update tile info
-                GameTiles.Instance.Move(formerLeftSelectedPlayingPiece, position);
-                // select tile
-                if (MovementPath.Count > 0)
-                    SelectPlayingPiece(formerLeftSelectedPlayingPiece);
-                else
+                // animate playing piece
+                formerLeftSelectedPlayingPiece.Animation = PlayingPieceTile.AnimationType.Walk;
+                SoundPlayer.Instance.Play("Marching");
+                // move playing piece
+                while (MovementPath.Count > 0)
                 {
-                    formerLeftSelectedPlayingPiece.Animation = PlayingPieceTile.AnimationType.Idle;
-                    DeselectPlayingPiece(formerLeftSelectedPlayingPiece);
+                    // get next position
+                    var position = MovementPath[0];
+                    MovementPath.RemoveAt(0);
+                    // get point between old and new position and animate movement
+                    var playingPieceWorldCoordinates = formerLeftSelectedPlayingPiece.Tilemap.CellToWorld(formerLeftSelectedPlayingPiece.BoardPosition);
+                    var newPosWordCoordinates = formerLeftSelectedPlayingPiece.Tilemap.CellToWorld(position);
+                    var line = new Line(playingPieceWorldCoordinates.x, playingPieceWorldCoordinates.y, newPosWordCoordinates.x, newPosWordCoordinates.y);
+                    var lineSegmentPoints = line.GetPoints(MovementLineSegmentCount);
+                    var newPositions = new List<Vector3>();
+                    lineSegmentPoints.ForEach(t => newPositions.Add(t));
+                    foreach (var newPos in newPositions)
+                    {
+                        // move playing piece
+                        formerLeftSelectedPlayingPiece.PlayingPiece.transform.position = newPos;
+                        // wait
+                        yield return new WaitForSeconds(TimeToMovePlayingPieceSec);
+                    }
+                    // update tile info
+                    GameTiles.Instance.Move(formerLeftSelectedPlayingPiece, position);
+                    // end movement animation
+                    if (MovementPath.Count > 0)
+                        SelectPlayingPiece(formerLeftSelectedPlayingPiece);
                 }
-                // wait
-                yield return new WaitForSeconds(TimeToMovePlayingPieceSec);
+                // end move animation
+                formerLeftSelectedPlayingPiece.Animation = PlayingPieceTile.AnimationType.Idle;
+                DeselectPlayingPiece(formerLeftSelectedPlayingPiece);
+                SoundPlayer.Instance.Stop("Marching");
+                // calculate points for movement
+                ActivePlayer.PointsLeft -= (int)Math.Round(costs);
             }
-            // calculate points for movement
-            ActivePlayer.PointsLeft -= (int)Math.Round(costs);
-            SoundPlayer.Instance.Stop("Marching");
+            AnimationRunning = false;
         }
-        AnimationRunning = false;
     }
 
     public float GetDistance(Vector3Int a, Vector3Int b)

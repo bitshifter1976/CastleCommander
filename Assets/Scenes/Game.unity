@@ -4384,7 +4384,7 @@ Transform:
   m_GameObject: {fileID: 280671495}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10000, y: -6000, z: -48600.004}
+  m_LocalPosition: {x: 10000, y: -7500, z: -48600.004}
   m_LocalScale: {x: 2160, y: 2160, z: 540}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5288,7 +5288,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 5000, y: -7000}
+  m_AnchoredPosition: {x: 5000, y: -10000}
   m_SizeDelta: {x: 10000, y: 10000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &321149538
@@ -7139,10 +7139,10 @@ RectTransform:
   - {fileID: 1745322994}
   m_Father: {fileID: 1173587251}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 19000, y: -10500}
-  m_SizeDelta: {x: 30000, y: 15000}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &457110985
 MonoBehaviour:
@@ -9698,7 +9698,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 5000}
+  m_AnchoredPosition: {x: 0, y: 8735}
   m_SizeDelta: {x: 150, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &640804871
@@ -11816,7 +11816,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -5000, y: -7000}
+  m_AnchoredPosition: {x: -5000, y: -10000}
   m_SizeDelta: {x: 10000, y: 10000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &782916500
@@ -11979,11 +11979,13 @@ MonoBehaviour:
   - {fileID: 213031937}
   TimeToAddTileSec: 0
   TimeToEndRoundSec: 30
-  TimeToMovePlayingPieceSec: 0.5
+  TimeToMovePlayingPieceSec: 0.02
+  TimeToDeleteDeadPlayingPieceSec: 5
   AlphaSelected: 1
   AlphaUnselected: 0.390625
   ActivePlayer: {fileID: 0}
   State: 0
+  MovementLineSegmentCount: 30
   MovementPath: []
   MovementDirectionsOdd:
   - {x: -1, y: 0, z: 0}
@@ -14320,7 +14322,7 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {r: 3.6767e-41, g: 3.6767e-41, b: 3.6767e-41, a: 3.6767e-41}
   - m_RefCount: 4
-    m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
+    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
   - m_RefCount: 0
     m_Data: {r: 3.6764e-41, g: 3.6764e-41, b: 3.6764e-41, a: 3.6764e-41}
   m_TileObjectToInstantiateArray: []
@@ -17090,7 +17092,7 @@ Tilemap:
   - m_RefCount: 0
     m_Data: {r: 3.7059e-41, g: 3.7059e-41, b: 3.7059e-41, a: 3.7059e-41}
   - m_RefCount: 4
-    m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
+    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
   - m_RefCount: 0
     m_Data: {r: 3.7056e-41, g: 3.7056e-41, b: 3.7056e-41, a: 3.7056e-41}
   m_TileObjectToInstantiateArray: []
@@ -28455,7 +28457,7 @@ Transform:
   m_GameObject: {fileID: 1725030787}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10000, y: -6000, z: -48600.004}
+  m_LocalPosition: {x: -10000, y: -7500, z: -48600.004}
   m_LocalScale: {x: 2160, y: 2160, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
