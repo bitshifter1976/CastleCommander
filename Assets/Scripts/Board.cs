@@ -724,10 +724,11 @@ public class Board : MonoBehaviour
         formerLeftSelectedPlayingPiece = playingPiece;
         MouseHandler.LeftSelectedPlayingPiecePosition = playingPiece.BoardPosition;
         MouseHandler.LeftSelectedPlayingPiece = playingPiece;
-        var selectedPlayingField = GameTiles.Instance.GetCastle(ActivePlayer.PlayerId);
-        var selectedCastle = GameTiles.Instance.Select;
-        selectedCastle.color = new Color(ActivePlayer.Color.r, ActivePlayer.Color.g, ActivePlayer.Color.b, AlphaSelected);
-        TilemapSelect.SetTile(selectedPlayingField.BoardPosition, selectedCastle);
+        var selectedCastle = GameTiles.Instance.GetCastle(ActivePlayer.PlayerId);
+        var selectedTile = GameTiles.Instance.Select;
+        selectedTile.color = new Color(ActivePlayer.Color.r, ActivePlayer.Color.g, ActivePlayer.Color.b, AlphaSelected);
+        TilemapSelect.SetTile(selectedCastle.BoardPosition, selectedTile);
+        TilemapSelect.SetTile(playingPiece.BoardPosition, selectedTile);
     }
 
     private void DeselectPlayingPiece(PlayingPieceTile playingPiece)
@@ -742,6 +743,7 @@ public class Board : MonoBehaviour
             leftSelectedPlayingPiece = null;
             MouseHandler.LeftSelectedPlayingPiecePosition = Vector3Int.zero;
             MouseHandler.LeftSelectedPlayingPiece = null;
+            TilemapSelect.SetTile(playingPiece.BoardPosition, null);
         }
     }
 
@@ -755,8 +757,12 @@ public class Board : MonoBehaviour
         if (MovementPath.Count > 0 && formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.BoardPosition != null)
         {
             AnimationRunning = true;
+            // remove selection
+            TilemapSelect.SetTile(formerLeftSelectedPlayingPiece.BoardPosition, null);
+            // calculate costs
             var movementCosts = GameTiles.Instance.LandscapeTiles.Values.Where(t => MovementPath.Contains(t.BoardPosition)).Sum(t => t.MovementCost);
             var costs = CalcualteMovementCosts(movementCosts, formerLeftSelectedPlayingPiece.Info.Speed);
+            // if enough points for movement
             if (costs <= ActivePlayer.PointsLeft)
             {
                 // animate playing piece
@@ -766,28 +772,30 @@ public class Board : MonoBehaviour
                 while (MovementPath.Count > 0)
                 {
                     // get next position
-                    var position = MovementPath[0];
+                    var nextPosition = MovementPath[0];
                     MovementPath.RemoveAt(0);
                     // get point between old and new position and animate movement
                     var playingPieceWorldCoordinates = formerLeftSelectedPlayingPiece.Tilemap.CellToWorld(formerLeftSelectedPlayingPiece.BoardPosition);
-                    var newPosWordCoordinates = formerLeftSelectedPlayingPiece.Tilemap.CellToWorld(position);
-                    var line = new Line(playingPieceWorldCoordinates.x, playingPieceWorldCoordinates.y, newPosWordCoordinates.x, newPosWordCoordinates.y);
+                    var oldPosWorldCoordinates = formerLeftSelectedPlayingPiece.Tilemap.CellToWorld(formerLeftSelectedPlayingPiece.BoardPosition);
+                    var nextPosWorldCoordinates = formerLeftSelectedPlayingPiece.Tilemap.CellToWorld(nextPosition);
+                    var line = new Line(playingPieceWorldCoordinates.x, playingPieceWorldCoordinates.y, nextPosWorldCoordinates.x, nextPosWorldCoordinates.y);
                     var lineSegmentPoints = line.GetPoints(MovementLineSegmentCount);
                     var newPositions = new List<Vector3>();
                     lineSegmentPoints.ForEach(t => newPositions.Add(t));
+                    // rotate playing piece into movement direction
+                    formerLeftSelectedPlayingPiece.PlayingPiece.transform.forward = nextPosWorldCoordinates - oldPosWorldCoordinates;
                     foreach (var newPos in newPositions)
                     {
                         // move playing piece
-                        formerLeftSelectedPlayingPiece.PlayingPiece.transform.position = newPos;
+                        formerLeftSelectedPlayingPiece.Position = newPos;
                         // wait
                         yield return new WaitForSeconds(TimeToMovePlayingPieceSec);
                     }
                     // update tile info
-                    GameTiles.Instance.Move(formerLeftSelectedPlayingPiece, position);
-                    // end movement animation
-                    if (MovementPath.Count > 0)
-                        SelectPlayingPiece(formerLeftSelectedPlayingPiece);
+                    GameTiles.Instance.Move(formerLeftSelectedPlayingPiece, nextPosition);
                 }
+                // rotate back to normal angle
+                formerLeftSelectedPlayingPiece.HeadTowardsEnemy();
                 // end move animation
                 formerLeftSelectedPlayingPiece.Animation = PlayingPieceTile.AnimationType.Idle;
                 DeselectPlayingPiece(formerLeftSelectedPlayingPiece);

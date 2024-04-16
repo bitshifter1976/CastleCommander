@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -45,6 +46,16 @@ public class PlayingPieceTile : GameTile
         }
     }
 
+    public Vector3 Position
+    {
+        get => PlayingPiece != null ? PlayingPiece.transform.position : Vector3.zero;
+        set
+        {
+            if (PlayingPiece != null)
+                PlayingPiece.transform.position = value;
+        }
+    }
+
     public AnimationType Animation
     {
         get => animationType;
@@ -64,6 +75,19 @@ public class PlayingPieceTile : GameTile
         BoardPosition = boardPosition;
         animator = PlayingPiece.GetComponent<Animator>();
         animationType = AnimationType.Idle;
-        PlayingPiece.transform.Rotate(0, player.PlayerId == 1 ? 90 : 270, 0);
+        HeadTowardsEnemy();
+    }
+
+    public void HeadTowardsEnemy()
+    {
+        var enemyCastle = GameTiles.Instance.CastleTiles.Values.FirstOrDefault(c => c.Player.PlayerId != Player.PlayerId);
+        if (enemyCastle != null && PlayingPiece != null)
+        {
+            var enemyCastleWorldPosition = Tilemap.CellToWorld(enemyCastle.BoardPosition);
+            var direction = enemyCastleWorldPosition - PlayingPiece.transform.position;
+            PlayingPiece.transform.forward = new Vector3(direction.x >= 0 ? 1 : -1, 0, 0);
+        }
+        else
+            PlayingPiece.transform.forward = new Vector3(Player.PlayerId == 1 ? 1 : -1, 0, 0);
     }
 }
