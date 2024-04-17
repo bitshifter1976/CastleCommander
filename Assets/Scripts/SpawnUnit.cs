@@ -54,7 +54,7 @@ public class SpawnUnit : MonoBehaviour
         ButtonSpawnMedic.onClick.AddListener(OnSpawnMedic);
 
         ChangeHighlightedColor(ButtonSpawnArtillery, Board.ActivePlayer.Color);
-        ChangeHighlightedColor(ButtonClose, Color.green);
+        ChangeHighlightedColor(ButtonClose, Board.ActivePlayer.Color);
         ChangeHighlightedColor(ButtonSpawnCavalry, Board.ActivePlayer.Color);
         ChangeHighlightedColor(ButtonSpawnInfantry, Board.ActivePlayer.Color);
         ChangeHighlightedColor(ButtonSpawnMedic, Board.ActivePlayer.Color);
