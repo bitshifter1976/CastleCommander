@@ -22,8 +22,8 @@ public class SpawnUnit : MonoBehaviour
     public Board Board;
     public Vector3Int Position;
 
-    private void Start()
-    {        
+    private void OnEnable()
+    {
         Heading[0].text = $"unit{Environment.NewLine}type";
         Heading[1].text = $"spawn";
         Heading[2].text = $"spawn{Environment.NewLine}costs";
@@ -44,6 +44,17 @@ public class SpawnUnit : MonoBehaviour
         ButtonSpawnCavalry.onClick.AddListener(OnSpawnCavalry);
         ButtonSpawnInfantry.onClick.AddListener(OnSpawnInfantry);
         ButtonSpawnMedic.onClick.AddListener(OnSpawnMedic);
+        ChangeHighlightedColor(ButtonSpawnArtillery, Board.ActivePlayer.Color);
+        ChangeHighlightedColor(ButtonSpawnCavalry, Board.ActivePlayer.Color);
+        ChangeHighlightedColor(ButtonSpawnInfantry, Board.ActivePlayer.Color);
+        ChangeHighlightedColor(ButtonSpawnMedic, Board.ActivePlayer.Color);
+    }
+
+    private void ChangeHighlightedColor(Button button, Color color)
+    {
+        var colors = button.colors;
+        colors.highlightedColor = color;
+        button.colors = colors;
     }
 
     private void OnSpawnMedic()
