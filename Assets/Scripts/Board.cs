@@ -648,7 +648,7 @@ public class Board : MonoBehaviour
 
     private void PlacePlayingPiece(Vector3Int position)
     {
-        if (SpawnUnit != null && ActivePlayer.SpawnsPointsLeft >= 0)
+        if (SpawnUnit != null && !SpawnUnit.gameObject.activeSelf && ActivePlayer.SpawnsPointsLeft >= 0)
         {
             SpawnUnit.Position = position;
             SpawnUnit.gameObject.SetActive(true);

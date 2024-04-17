@@ -40,10 +40,16 @@ public class SpawnUnit : MonoBehaviour
         CreateRow(Text4, GameTiles.Instance.PlayingPieceTileInfos.First(t => t.PlayingPieceType == PlayingPieceTile.PlayingPieceTileType.Infantry));
         CreateRow(Text5, GameTiles.Instance.PlayingPieceTileInfos.First(t => t.PlayingPieceType == PlayingPieceTile.PlayingPieceTileType.Medic));
 
+        ButtonSpawnArtillery.onClick.RemoveAllListeners();
+        ButtonSpawnCavalry.onClick.RemoveAllListeners();
+        ButtonSpawnInfantry.onClick.RemoveAllListeners();
+        ButtonSpawnMedic.onClick.RemoveAllListeners();
+
         ButtonSpawnArtillery.onClick.AddListener(OnSpawnArtillery);
         ButtonSpawnCavalry.onClick.AddListener(OnSpawnCavalry);
         ButtonSpawnInfantry.onClick.AddListener(OnSpawnInfantry);
         ButtonSpawnMedic.onClick.AddListener(OnSpawnMedic);
+
         ChangeHighlightedColor(ButtonSpawnArtillery, Board.ActivePlayer.Color);
         ChangeHighlightedColor(ButtonSpawnCavalry, Board.ActivePlayer.Color);
         ChangeHighlightedColor(ButtonSpawnInfantry, Board.ActivePlayer.Color);
@@ -59,24 +65,28 @@ public class SpawnUnit : MonoBehaviour
 
     private void OnSpawnMedic()
     {
+        ButtonSpawnMedic.onClick.RemoveAllListeners();
         Board.CreatePlayingPiece(Position, PlayingPieceTile.PlayingPieceTileType.Medic);
         gameObject.SetActive(false);
     }
 
     private void OnSpawnInfantry()
     {
+        ButtonSpawnInfantry.onClick.RemoveAllListeners();
         Board.CreatePlayingPiece(Position, PlayingPieceTile.PlayingPieceTileType.Infantry);
         gameObject.SetActive(false);
     }
 
     private void OnSpawnCavalry()
     {
+        ButtonSpawnCavalry.onClick.RemoveAllListeners();
         Board.CreatePlayingPiece(Position, PlayingPieceTile.PlayingPieceTileType.Cavalry);
         gameObject.SetActive(false);
     }
 
     private void OnSpawnArtillery()
     {
+        ButtonSpawnArtillery.onClick.RemoveAllListeners();
         Board.CreatePlayingPiece(Position, PlayingPieceTile.PlayingPieceTileType.Artillery);
         gameObject.SetActive(false);
     }
