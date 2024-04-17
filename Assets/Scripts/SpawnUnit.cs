@@ -16,6 +16,7 @@ public class SpawnUnit : MonoBehaviour
     public List<TextMeshProUGUI> Text5;
 
     public Button ButtonSpawnArtillery;
+    public Button ButtonClose;
     public Button ButtonSpawnCavalry;
     public Button ButtonSpawnInfantry;
     public Button ButtonSpawnMedic;
@@ -41,16 +42,19 @@ public class SpawnUnit : MonoBehaviour
         CreateRow(Text5, GameTiles.Instance.PlayingPieceTileInfos.First(t => t.PlayingPieceType == PlayingPieceTile.PlayingPieceTileType.Medic));
 
         ButtonSpawnArtillery.onClick.RemoveAllListeners();
+        ButtonClose.onClick.RemoveAllListeners();
         ButtonSpawnCavalry.onClick.RemoveAllListeners();
         ButtonSpawnInfantry.onClick.RemoveAllListeners();
         ButtonSpawnMedic.onClick.RemoveAllListeners();
 
         ButtonSpawnArtillery.onClick.AddListener(OnSpawnArtillery);
+        ButtonClose.onClick.AddListener(OnClose);
         ButtonSpawnCavalry.onClick.AddListener(OnSpawnCavalry);
         ButtonSpawnInfantry.onClick.AddListener(OnSpawnInfantry);
         ButtonSpawnMedic.onClick.AddListener(OnSpawnMedic);
 
         ChangeHighlightedColor(ButtonSpawnArtillery, Board.ActivePlayer.Color);
+        ChangeHighlightedColor(ButtonClose, Color.red);
         ChangeHighlightedColor(ButtonSpawnCavalry, Board.ActivePlayer.Color);
         ChangeHighlightedColor(ButtonSpawnInfantry, Board.ActivePlayer.Color);
         ChangeHighlightedColor(ButtonSpawnMedic, Board.ActivePlayer.Color);
@@ -61,6 +65,12 @@ public class SpawnUnit : MonoBehaviour
         var colors = button.colors;
         colors.highlightedColor = color;
         button.colors = colors;
+    }
+
+    private void OnClose()
+    {
+        ButtonClose.onClick.RemoveAllListeners();
+        gameObject.SetActive(false);
     }
 
     private void OnSpawnMedic()
