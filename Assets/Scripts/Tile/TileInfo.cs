@@ -26,6 +26,7 @@ public class PlayingPieceTileInfo
 {
     public PlayingPieceTileType PlayingPieceType;
     public GameObject PlayingPiece;
+    public int SpawnCosts;
     public int Attack;
     public int Defense;
     public int Speed;
@@ -35,9 +36,10 @@ public class PlayingPieceTileInfo
     public bool IsAttacker;
     public static readonly int MaxEnergy = 10;
 
-    public PlayingPieceTileInfo(PlayingPieceTileType tileType, int attack, int defense, int speed, int distanceForAttack, int pointsForAttack)
+    public PlayingPieceTileInfo(PlayingPieceTileType tileType, int spawnCosts, int attack, int defense, int speed, int distanceForAttack, int pointsForAttack)
     {
         PlayingPieceType = tileType;
+        SpawnCosts = spawnCosts;
         Attack = attack;
         Defense = defense;
         Speed = speed;
@@ -48,7 +50,7 @@ public class PlayingPieceTileInfo
 
     public PlayingPieceTileInfo Clone()
     {
-        return new PlayingPieceTileInfo(PlayingPieceType, Attack, Defense, Speed, DistanceForAttack, PointsForAttack);
+        return new PlayingPieceTileInfo(PlayingPieceType, SpawnCosts, Attack, Defense, Speed, DistanceForAttack, PointsForAttack);
     }
 }
 

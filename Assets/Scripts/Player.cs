@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     public Tile InfantryTile; 
     public Tile MedicTile;
     public int PointsLeft;
-    public int SpawnsLeft;
+    public int SpawnsPointsLeft;
     public bool Active;
     public float Distance;
 
@@ -138,7 +138,21 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(1f);
         // select unit type in popup
         var randomUnitType = (PlayingPieceTileType)Random.Range(0, Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max()+1);
-        board.DoSelectUnitType(randomUnitType);
+        switch (randomUnitType)
+        {
+            case PlayingPieceTileType.Artillery:
+                board.CreatePlayingPiece(castle.BoardPosition, PlayingPieceTileType.Artillery);
+                break;
+            case PlayingPieceTileType.Cavalry:
+                board.CreatePlayingPiece(castle.BoardPosition, PlayingPieceTileType.Cavalry);
+                break;
+            case PlayingPieceTileType.Infantry:
+                board.CreatePlayingPiece(castle.BoardPosition, PlayingPieceTileType.Infantry);
+                break;
+            case PlayingPieceTileType.Medic:
+                board.CreatePlayingPiece(castle.BoardPosition, PlayingPieceTileType.Medic);
+                break;
+        }
         yield return new WaitForSeconds(1f);
     }
 

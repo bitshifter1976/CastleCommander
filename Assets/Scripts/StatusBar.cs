@@ -14,7 +14,7 @@ public class StatusBar : MonoBehaviour
     {
         Text1.text = $"player {Player.PlayerId}";
         Text2.text = $"points: {Player.PointsLeft}";
-        Text3.text = $"spawns: {Player.SpawnsLeft}";
+        Text3.text = $"spawns: {Player.SpawnsPointsLeft}";
         Text4.text = $"distance: {Player.Distance}";
     }
 }

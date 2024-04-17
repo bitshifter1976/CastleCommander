@@ -75,10 +75,10 @@ public class PlayingPieceTile : GameTile
         BoardPosition = boardPosition;
         animator = PlayingPiece.GetComponent<Animator>();
         animationType = AnimationType.Idle;
-        HeadTowardsEnemy();
+        HeadTowardsEnemyCastle();
     }
 
-    public void HeadTowardsEnemy()
+    public void HeadTowardsEnemyCastle()
     {
         var enemyCastle = GameTiles.Instance.CastleTiles.Values.FirstOrDefault(c => c.Player.PlayerId != Player.PlayerId);
         if (enemyCastle != null && PlayingPiece != null)

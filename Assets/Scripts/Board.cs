@@ -56,8 +56,6 @@ public class Board : MonoBehaviour
     public GameObject Hud;
     public Button ButtonReload;
     public Button ButtonEndTurn;
-    public Button ButtonShowUnitTypeInfo;
-    public Button ButtonHideUnitTypeInfo;
     public Timer Timer;
     public GameObject MessageBox;
     public Button MessageBoxButtonOk;
@@ -65,8 +63,7 @@ public class Board : MonoBehaviour
     public TextMeshProUGUI MessageBoxText;
     public TextMeshProUGUI MessageBoxButtonOkText;
     public TextMeshProUGUI MessageBoxButtonCancelText;
-    public GameObject SelectUnitTypePrefab;
-    public GameObject UnitTypeInfo;
+    public SpawnUnit SpawnUnit;
     public SelectionInfoBar UnitTypeInfoBar;
     public FightBoard FightBoard;
     [Header("Dices")]
@@ -85,6 +82,7 @@ public class Board : MonoBehaviour
     public BoardState State = BoardState.Load;
     [Header("Playing piece movement")]
     public int MovementLineSegmentCount = 2;
+    public int StartSpawnPoint = 100;
     public List<Vector3Int> MovementPath;
     public Vector3Int[] MovementDirectionsOdd  = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(0,1,0)/*top-left*/, new Vector3Int(1,1,0)/*top-right*/, new Vector3Int(0, -1, 0)/*bottom-left*/, new Vector3Int(1,-1,0)/*bottom-right*/ };
     public Vector3Int[] MovementDirectionsEven = new Vector3Int[6] { Vector3Int.left, Vector3Int.right, new Vector3Int(-1, 1, 0)/*top-left*/, new Vector3Int(0, 1, 0)/*top-right*/, new Vector3Int(-1, -1, 0)/*bottom-left*/, new Vector3Int(0, -1, 0)/*bottom-right*/ };
@@ -137,27 +135,16 @@ public class Board : MonoBehaviour
     private void Start()
     {
         MessageBox.SetActive(false);
+        SpawnUnit.gameObject.SetActive(false);
         FightBoardShowing = false;
         ActivePlayer = Player1;
         Player1.Active = true;
         Player2.Active = false;
         pathfinder = new Pathfinder<Vector3Int>(GetDistance, ConnectionsAndCosts);
         ButtonReload.onClick.AddListener(OnReloadClick);
-        ButtonShowUnitTypeInfo.onClick.AddListener(OnShowUnitTypeInfo);
-        ButtonHideUnitTypeInfo.onClick.AddListener(OnHideUnitTypeInfo);
         ButtonEndTurn.onClick.AddListener(OnEndTurn);
         MouseHandler.OnLeftClick += OnBoardLeftClick;
         MouseHandler.OnRightClick += OnBoardRightClick;
-    }
-
-    private void OnHideUnitTypeInfo()
-    {
-        UnitTypeInfo.SetActive(false);
-    }
-
-    private void OnShowUnitTypeInfo()
-    {
-        UnitTypeInfo.SetActive(true);
     }
 
     private void OnEndTurn()
@@ -305,7 +292,7 @@ public class Board : MonoBehaviour
                 }
             case BoardState.FinishRound:
                 {
-                    HideSelectUnitTypeBox();
+                    SpawnUnit.gameObject.SetActive(false);
                     DeselectPlayingPiece(formerLeftSelectedPlayingPiece);
                     TilemapPath.ClearAllTiles();
                     TilemapSelect.ClearAllTiles();
@@ -350,10 +337,10 @@ public class Board : MonoBehaviour
         tilesUnderTiles.Clear();
         GameTiles.Instance.Clear();
         Player1.PointsLeft = 0;
-        Player1.SpawnsLeft = 8;
+        Player1.SpawnsPointsLeft = StartSpawnPoint;
         Player1.Distance = 0;
         Player2.PointsLeft = 0;
-        Player2.SpawnsLeft = 8;
+        Player2.SpawnsPointsLeft = StartSpawnPoint;
         Player2.Distance = 0;
         CreateBoard();
     }
@@ -661,58 +648,38 @@ public class Board : MonoBehaviour
 
     private void PlacePlayingPiece(Vector3Int position)
     {
-        if (selectUnitTypeBox != null || ActivePlayer.SpawnsLeft < 1)
-            return;
-
-        ShowSelectUnitType(position);
-    }
-
-    private void ShowSelectUnitType(Vector3Int position)
-    {
-        selectUnitTypeBox = Instantiate(SelectUnitTypePrefab, Vector3.zero, Quaternion.identity);
-        selectUnitTypeBox.transform.SetParent(Hud.transform, false);
-        selectUnitTypeDropdown = selectUnitTypeBox.GetComponentInChildren<TMP_Dropdown>(true);
-        selectUnitTypeDropdown.onValueChanged.AddListener((choice) =>
+        if (SpawnUnit != null && ActivePlayer.SpawnsPointsLeft >= 0)
         {
-            var maxEnumValue = Enum.GetValues(typeof(PlayingPieceTileType)).Cast<int>().Max();
-            if (choice <= maxEnumValue)
-            {
-                var playingPieceType = (PlayingPieceTileType)choice;
-                Tile tile = null;
-                switch (playingPieceType)
-                {
-                    case PlayingPieceTileType.Artillery:
-                        tile = ActivePlayer.ArtilleryTile;
-                        break;
-                    case PlayingPieceTileType.Cavalry:
-                        tile = ActivePlayer.CavalryTile;
-                        break;
-                    case PlayingPieceTileType.Infantry:
-                        tile = ActivePlayer.InfantryTile;
-                        break;
-                    case PlayingPieceTileType.Medic:
-                        tile = ActivePlayer.MedicTile;
-                        break;
-                }
-                ActivePlayer.SpawnsLeft--;
-                var tileInfo = GameTiles.Instance.PlayingPieceTileInfos.First(i => i.PlayingPieceType == playingPieceType).Clone();
-                var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, null, TilemapPlayingPieces, ActivePlayer, playingPieceType, null);
-                SelectPlayingPiece(tile2 as PlayingPieceTile);
-            }
-
-            Destroy(selectUnitTypeBox);
-        });
+            SpawnUnit.Position = position;
+            SpawnUnit.gameObject.SetActive(true);
+        }
     }
 
-    private void HideSelectUnitTypeBox()
+    public void CreatePlayingPiece(Vector3Int position, PlayingPieceTileType type)
     {
-        if (selectUnitTypeBox != null)
-            Destroy(selectUnitTypeBox);
-    }
-
-    public void DoSelectUnitType(PlayingPieceTileType type)
-    {
-        selectUnitTypeDropdown.value = (int)type;
+        Tile tile = null;
+        switch (type)
+        {
+            case PlayingPieceTileType.Artillery:
+                tile = ActivePlayer.ArtilleryTile;
+                break;
+            case PlayingPieceTileType.Cavalry:
+                tile = ActivePlayer.CavalryTile;
+                break;
+            case PlayingPieceTileType.Infantry:
+                tile = ActivePlayer.InfantryTile;
+                break;
+            case PlayingPieceTileType.Medic:
+                tile = ActivePlayer.MedicTile;
+                break;
+        }
+        var tileInfo = GameTiles.Instance.PlayingPieceTileInfos.First(i => i.PlayingPieceType == type).Clone();
+        if (ActivePlayer.SpawnsPointsLeft >= tileInfo.SpawnCosts)
+        {
+            var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, null, TilemapPlayingPieces, ActivePlayer, type, null);
+            SelectPlayingPiece(tile2 as PlayingPieceTile);
+            ActivePlayer.SpawnsPointsLeft -= tileInfo.SpawnCosts;
+        }
     }
 
     private void SelectPlayingPiece(PlayingPieceTile playingPiece)
@@ -752,7 +719,7 @@ public class Board : MonoBehaviour
         StartCoroutine(DoMoveFormerSelectedPlayingPiece());
     }
 
-    IEnumerator DoMoveFormerSelectedPlayingPiece()
+    private IEnumerator DoMoveFormerSelectedPlayingPiece()
     {
         if (MovementPath.Count > 0 && formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.BoardPosition != null)
         {
@@ -795,7 +762,7 @@ public class Board : MonoBehaviour
                     GameTiles.Instance.Move(formerLeftSelectedPlayingPiece, nextPosition);
                 }
                 // rotate back to normal angle
-                formerLeftSelectedPlayingPiece.HeadTowardsEnemy();
+                formerLeftSelectedPlayingPiece.HeadTowardsEnemyCastle();
                 // end move animation
                 formerLeftSelectedPlayingPiece.Animation = PlayingPieceTile.AnimationType.Idle;
                 DeselectPlayingPiece(formerLeftSelectedPlayingPiece);
