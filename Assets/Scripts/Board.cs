@@ -624,7 +624,7 @@ public class Board : MonoBehaviour
     private void HealPlayingPiece(PlayingPieceTile attacker, PlayingPieceTile defender)
     {
         SoundPlayer.Instance.Play("Heal");
-        defender.Info.Energy = PlayingPieceTileInfo.MaxEnergy;
+        defender.Energy = PlayingPieceTileInfo.MaxEnergy;
     }
 
     private void ShowFightBoard(GameTile attacker, GameTile defender, bool rangedAttack)
@@ -752,7 +752,8 @@ public class Board : MonoBehaviour
                     var newPositions = new List<Vector3>();
                     lineSegmentPoints.ForEach(t => newPositions.Add(t));
                     // rotate playing piece into movement direction
-                    formerLeftSelectedPlayingPiece.PlayingPiece.transform.forward = nextPosWorldCoordinates - oldPosWorldCoordinates;
+                    var forwardVect = nextPosWorldCoordinates - oldPosWorldCoordinates;
+                    formerLeftSelectedPlayingPiece.PlayingPiece.transform.forward = forwardVect;
                     foreach (var newPos in newPositions)
                     {
                         // move playing piece

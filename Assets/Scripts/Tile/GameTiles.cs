@@ -52,8 +52,8 @@ public class GameTiles : MonoBehaviour
         return new List<PlayingPieceTileInfo>
         {
             //                                                       spawnCosts attack defense speed   distAtt ptsAtt
-            new PlayingPieceTileInfo(PlayingPieceTileType.Artillery, 15,        5,     0,      1,      30,     25),
-            new PlayingPieceTileInfo(PlayingPieceTileType.Cavalry,   25,        3,     1,      4,      7,      25),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Artillery, 15,        2,     2,      1,      30,     25),
+            new PlayingPieceTileInfo(PlayingPieceTileType.Cavalry,   25,        3,     2,      4,      2,      25),
             new PlayingPieceTileInfo(PlayingPieceTileType.Infantry,  10,        2,     3,      2,      2,      25),
             new PlayingPieceTileInfo(PlayingPieceTileType.Medic,     20,        1,     1,      3,      2,      25),
         };

@@ -15,7 +15,9 @@ public class CastleTile : GameTile
         get => Info.Energy;
         set
         {
-            HorizontalHealthbar.SetProgress(value/MaxEnergy);
+            if (value < 0)
+                value = 0;
+            HorizontalHealthbar.SetProgress((float)value/(float)MaxEnergy);
             Info.Energy = value;
         }
     }
@@ -34,8 +36,7 @@ public class CastleTile : GameTile
             if (Healthbar != null)
             {
                 var newPos = Tilemap.CellToWorld(value);
-                Healthbar.transform.position = newPos;
-                Healthbar.transform.position = newPos + new Vector3(0f, 3f, 0f);
+                Healthbar.transform.position = newPos + new Vector3(0f, 300f, 0f);
             }
         }
     }
@@ -48,8 +49,7 @@ public class CastleTile : GameTile
             if (Healthbar != null)
             {
                 var newPos = value;
-                Healthbar.transform.position = newPos;
-                Healthbar.transform.position = newPos + new Vector3(0f, 3f, 0f);
+                Healthbar.transform.position = newPos + new Vector3(0f, 300f, 0f);
             }
         }
     }

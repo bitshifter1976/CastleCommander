@@ -68,11 +68,12 @@ public class PlayingPieceTile : GameTile
         set
         {
             animationType = value;
-            animator.Play(animationType.ToString(), 0);
+            if (animator != null)
+                animator.Play(animationType.ToString(), 0);
         }
     }
 
-    private HorizontalProgressBar Healthbar
+    public HorizontalProgressBar Healthbar
     {
         get => PlayingPiece?.GetComponentInChildren<HorizontalProgressBar>();
     }
@@ -82,7 +83,9 @@ public class PlayingPieceTile : GameTile
         get => Info.Energy;
         set
         {
-            Healthbar.SetProgress(value / PlayingPieceTileInfo.MaxEnergy);
+            if (value < 0)
+                value = 0;
+            Healthbar.SetProgress((float)value / (float)PlayingPieceTileInfo.MaxEnergy);
             Info.Energy = value;
         }
     }
