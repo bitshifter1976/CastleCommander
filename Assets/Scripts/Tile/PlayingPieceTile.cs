@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
+using MagicPigGames;
 using System.Linq;
-using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using static GameTile;
@@ -32,6 +29,7 @@ public class PlayingPieceTile : GameTile
     public PlayingPieceTileType PlayingPieceType;
     public Player Player;
     public GameObject PlayingPiece;
+    public ProgressBar ProgressBar;
     private Animator animator;
     private AnimationType animationType;
 
@@ -42,7 +40,11 @@ public class PlayingPieceTile : GameTile
         {
             base.BoardPosition = value;
             if (PlayingPiece != null)
-                PlayingPiece.transform.position = Tilemap.CellToWorld(value);
+            {
+                var newPos = Tilemap.CellToWorld(value);
+                PlayingPiece.transform.position = newPos;
+                Healthbar.transform.position = newPos + new Vector3(0f, PlayingPieceType == PlayingPieceTileType.Cavalry ? 3f : 2.2f, 0f);
+            }
         }
     }
 
@@ -52,7 +54,11 @@ public class PlayingPieceTile : GameTile
         set
         {
             if (PlayingPiece != null)
-                PlayingPiece.transform.position = value;
+            {
+                var newPos = value;
+                PlayingPiece.transform.position = newPos;
+                Healthbar.transform.position = newPos + new Vector3(0f, PlayingPieceType == PlayingPieceTileType.Cavalry ? 3f : 2.2f, 0f);
+            }
         }
     }
 
@@ -63,6 +69,21 @@ public class PlayingPieceTile : GameTile
         {
             animationType = value;
             animator.Play(animationType.ToString(), 0);
+        }
+    }
+
+    private HorizontalProgressBar Healthbar
+    {
+        get => PlayingPiece?.GetComponentInChildren<HorizontalProgressBar>();
+    }
+
+    public int Energy
+    {
+        get => Info.Energy;
+        set
+        {
+            Healthbar.SetProgress(value / PlayingPieceTileInfo.MaxEnergy);
+            Info.Energy = value;
         }
     }
 

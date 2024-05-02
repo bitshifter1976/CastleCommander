@@ -244,17 +244,17 @@ public class Board : MonoBehaviour
                                 playingPiece.Animation = AnimationType.Idle;
                             if (FightBoard.Tile2 is PlayingPieceTile playingPiece2)
                                 playingPiece2.Animation = AnimationType.Idle;
-                            if (FightBoard.Tile1 is PlayingPieceTile t && t.Info.Energy <= 0)
+                            if (FightBoard.Tile1 is PlayingPieceTile t && t.Energy <= 0)
                             {
                                 t.Animation = AnimationType.Death;
                                 StartCoroutine(DoDeleteAfterTime(FightBoard.Tile1, TimeToDeleteDeadPlayingPieceSec));
                             }
-                            else if (FightBoard.Tile2 is PlayingPieceTile t2 && t2.Info.Energy <= 0)
+                            else if (FightBoard.Tile2 is PlayingPieceTile t2 && t2.Energy <= 0)
                             {
                                 t2.Animation = AnimationType.Death;
                                 StartCoroutine(DoDeleteAfterTime(FightBoard.Tile2, TimeToDeleteDeadPlayingPieceSec));
                             }
-                            else if (FightBoard.Tile2 is CastleTile c && c.Info.Energy <= 0)
+                            else if (FightBoard.Tile2 is CastleTile c && c.Energy <= 0)
                             {
                                 GameTiles.Instance.Delete(FightBoard.Tile2);
                                 var winningUnits = GameTiles.Instance.PlayingPieceTiles.Where(p => p.Value.Player.PlayerId != c.Player.PlayerId).ToList();
@@ -655,7 +655,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void CreatePlayingPiece(Vector3Int position, PlayingPieceTileType type)
+    public GameTile CreatePlayingPiece(Vector3Int position, PlayingPieceTileType type)
     {
         Tile tile = null;
         switch (type)
@@ -679,7 +679,9 @@ public class Board : MonoBehaviour
             var tile2 = GameTiles.Instance.Add(GameTile.TileType.PlayingPiece, position, tile, null, tileInfo, null, TilemapPlayingPieces, ActivePlayer, type, null);
             SelectPlayingPiece(tile2 as PlayingPieceTile);
             ActivePlayer.SpawnsPointsLeft -= tileInfo.SpawnCosts;
+            return tile2;
         }
+        return null;
     }
 
     private void SelectPlayingPiece(PlayingPieceTile playingPiece)

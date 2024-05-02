@@ -1,10 +1,12 @@
-﻿using System;
+﻿using MagicPigGames;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using static PlayingPieceTile;
+using static UnityEditor.PlayerSettings;
 using Random = UnityEngine.Random;
 
 public class GameTiles : MonoBehaviour
@@ -152,7 +154,8 @@ public class GameTiles : MonoBehaviour
         switch (type)
         {
             case GameTile.TileType.Castle:
-                CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tileInfo3, tilemap, NewId(), tileInfo.Tile.color, player, true, tileInfo.MovementCosts));
+                var healthbar = CreateHealhbar(tilemap.CellToWorld(boardPosition), null);
+                CastleTiles.Add(boardPosition, new CastleTile(boardPosition, tile, tileInfo3, healthbar, tilemap, NewId(), tileInfo.Tile.color, player, true, tileInfo.MovementCosts));
                 return CastleTiles[boardPosition];
             case GameTile.TileType.Landscape:
                 LandscapeTiles.Add(boardPosition, new LandscapeTile(boardPosition, tile, tilemap, NewId(), tileInfo.Tile.color, landscapeType.Value, TilesForMovement.Contains(tileInfo.Tile), tileInfo.MovementCosts));
@@ -187,8 +190,32 @@ public class GameTiles : MonoBehaviour
         var prefab = AssetDatabase.LoadAssetAtPath($"Assets/Prefabs/{prefabName}.prefab", typeof(GameObject));
         var pos = tilemap.CellToWorld(boardPosition);
         var clone = Instantiate(prefab, pos, Quaternion.identity) as GameObject;
+        // add life bar
+        CreateHealhbar(pos, clone);
 
         return clone;
+    }
+
+    private static GameObject CreateHealhbar(Vector3 pos, GameObject parent)
+    {
+        var gameObjectCanvas = new GameObject("Canvas");
+        if (parent == null)
+            parent = new GameObject();
+        gameObjectCanvas.transform.parent = parent.transform;
+        var canvasForLifeBar = gameObjectCanvas.AddComponent<Canvas>();
+        canvasForLifeBar.sortingLayerName = "Ui";
+        canvasForLifeBar.sortingOrder = 10;
+        var cameraGo = GameObject.FindGameObjectWithTag("MainCamera");
+        var camera = cameraGo.GetComponent<Camera>();
+        canvasForLifeBar.worldCamera = camera;
+        canvasForLifeBar.renderMode = RenderMode.ScreenSpaceCamera;
+        var prefabName = "Horizontal Progress Bar";
+        var lifebarPrefab = AssetDatabase.LoadAssetAtPath($"Assets/Prefabs/{prefabName}.prefab", typeof(GameObject));
+        var lifebarClone = Instantiate(lifebarPrefab, pos, Quaternion.identity) as GameObject;
+        lifebarClone.transform.parent = gameObjectCanvas.transform;
+        lifebarClone.transform.position = pos;
+        lifebarClone.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        return lifebarClone;
     }
 
     public void Delete(GameTile tile)

@@ -97,12 +97,12 @@ public class FightBoard : MonoBehaviour
                         var damage = attack - defense;
                         if (damage < 0)
                         {
-                            t1.Info.Energy += damage;
+                            t1.Energy += damage;
                             Result.text += $"damage to player {t1.Player.PlayerId} : {-damage}";
                         }
                         else
                         {
-                            t2.Info.Energy -= damage;
+                            t2.Energy -= damage;
                             Result.text += $"damage to player {t2.Player.PlayerId}: {damage}";
                         }
                     }
@@ -115,12 +115,12 @@ public class FightBoard : MonoBehaviour
                         var damage = attack - defense;
                         if (damage < 0)
                         {
-                            t4.Info.Energy += damage;
+                            t4.Energy += damage;
                             Result.text += $"damage to player {t4.Player.PlayerId} : {-damage}";
                         }
                         else
                         {
-                            t3.Info.Energy -= damage;
+                            t3.Energy -= damage;
                             Result.text += $"damage to player {t3.Player.PlayerId}: {damage}";
                         }
                     }
@@ -133,12 +133,12 @@ public class FightBoard : MonoBehaviour
                         var damage = attack - defense;
                         if (damage < 0)
                         {
-                            t5.Info.Energy += damage;
+                            t5.Energy += damage;
                             Result.text += $"damage to player {t5.Player.PlayerId} : {-damage}";
                         }
                         else
                         {
-                            t6.Info.Energy -= damage;
+                            t6.Energy -= damage;
                             Result.text += $"damage to castle {t6.Player.PlayerId}: {damage}";
                         }
                     }

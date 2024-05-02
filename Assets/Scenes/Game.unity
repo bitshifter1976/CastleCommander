@@ -16508,7 +16508,7 @@ Tilemap:
       m_TileIndex: 0
       m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 2
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -16528,7 +16528,7 @@ Tilemap:
       m_TileIndex: 0
       m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 2
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -16576,13 +16576,13 @@ Tilemap:
       e33: 1
   m_TileColorArray:
   - m_RefCount: 0
-    m_Data: {r: 6.8117e-41, g: 6.8117e-41, b: 6.8117e-41, a: 6.8117e-41}
+    m_Data: {r: 4.2686e-41, g: 4.2686e-41, b: 4.2686e-41, a: 4.2686e-41}
+  - m_RefCount: 0
+    m_Data: {r: 4.2686e-41, g: 4.2686e-41, b: 4.2686e-41, a: 4.2686e-41}
   - m_RefCount: 2
     m_Data: {r: 0.46274513, g: 0.8862746, b: 0.15686275, a: 0.390625}
-  - m_RefCount: 0
-    m_Data: {r: 6.8117e-41, g: 6.8117e-41, b: 6.8117e-41, a: 6.8117e-41}
   - m_RefCount: 4
-    m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
+    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -19087,7 +19087,7 @@ Tilemap:
       m_TileIndex: 0
       m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 2
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -19107,7 +19107,7 @@ Tilemap:
       m_TileIndex: 0
       m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
-      m_TileColorIndex: 1
+      m_TileColorIndex: 2
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
@@ -19155,13 +19155,13 @@ Tilemap:
       e33: 1
   m_TileColorArray:
   - m_RefCount: 0
-    m_Data: {r: 6.8386e-41, g: 6.8386e-41, b: 6.8386e-41, a: 6.8386e-41}
+    m_Data: {r: 4.2955e-41, g: 4.2955e-41, b: 4.2955e-41, a: 4.2955e-41}
+  - m_RefCount: 0
+    m_Data: {r: 4.2955e-41, g: 4.2955e-41, b: 4.2955e-41, a: 4.2955e-41}
   - m_RefCount: 2
     m_Data: {r: 0.46274513, g: 0.8862746, b: 0.15686275, a: 0.390625}
-  - m_RefCount: 0
-    m_Data: {r: 6.8386e-41, g: 6.8386e-41, b: 6.8386e-41, a: 6.8386e-41}
   - m_RefCount: 4
-    m_Data: {r: 1, g: 0, b: 0, a: 0.390625}
+    m_Data: {r: 0, g: 1, b: 0, a: 0.390625}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -34312,7 +34312,7 @@ Tilemap:
       e33: 1
   m_TileColorArray:
   - m_RefCount: 0
-    m_Data: {r: 7.002e-41, g: 7.002e-41, b: 7.002e-41, a: 7.002e-41}
+    m_Data: {r: 4.459e-41, g: 4.459e-41, b: 4.459e-41, a: 4.459e-41}
   - m_RefCount: 2
     m_Data: {r: 0.46274513, g: 0.8862746, b: 0.15686275, a: 0.390625}
   m_TileObjectToInstantiateArray: []
