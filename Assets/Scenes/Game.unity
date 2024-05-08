@@ -14338,7 +14338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GeneratorMode: 0
-  State: 2
+  State: 0
   BoardWidth: 24
   BoardHeight: 14
   Player1: {fileID: 2076343}
@@ -20138,12 +20138,12 @@ GameObject:
   - component: {fileID: 1094506692}
   - component: {fileID: 1094506691}
   m_Layer: 3
-  m_Name: PicButton
+  m_Name: Button Intro
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1094506691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35771,7 +35771,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1907451313
 RectTransform:
   m_ObjectHideFlags: 0
