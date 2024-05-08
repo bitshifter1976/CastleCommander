@@ -20,6 +20,8 @@ public class Board : MonoBehaviour
 
     public enum BoardState
     {
+        Intro,
+        Menu,
         Load,
         ConfirmLoad,
         CreateBoard,
@@ -39,6 +41,7 @@ public class Board : MonoBehaviour
     [Header("********** Configuration **********")]
     [Header("General")]
     public BoardMode GeneratorMode = BoardMode.WholeBoard;
+    public BoardState State = BoardState.Intro;
     public int BoardWidth = 24;
     public int BoardHeight = 14;
     [Header("Player")]
@@ -53,6 +56,7 @@ public class Board : MonoBehaviour
     [Header("Input")]
     public MouseHandler MouseHandler;
     [Header("Hud")]
+    public Button ButtonIntro;
     public GameObject Hud;
     public Button ButtonReload;
     public Button ButtonEndTurn;
@@ -79,7 +83,6 @@ public class Board : MonoBehaviour
     [Header("********** Info **********")]
     [Header("General")]
     public Player ActivePlayer;
-    public BoardState State = BoardState.Load;
     [Header("Playing piece movement")]
     public int MovementLineSegmentCount = 2;
     public int StartSpawnPoint = 100;
@@ -134,6 +137,7 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
+        ButtonIntro.gameObject.SetActive(false);
         MessageBox.SetActive(false);
         SpawnUnit.gameObject.SetActive(false);
         FightBoardShowing = false;
@@ -141,10 +145,18 @@ public class Board : MonoBehaviour
         Player1.Active = true;
         Player2.Active = false;
         pathfinder = new Pathfinder<Vector3Int>(GetDistance, ConnectionsAndCosts);
+        ButtonIntro.onClick.AddListener(OnIntroClick);
         ButtonReload.onClick.AddListener(OnReloadClick);
         ButtonEndTurn.onClick.AddListener(OnEndTurn);
         MouseHandler.OnLeftClick += OnBoardLeftClick;
         MouseHandler.OnRightClick += OnBoardRightClick;
+    }
+
+    private void OnIntroClick()
+    {
+        ButtonIntro.onClick.RemoveAllListeners();
+        ButtonIntro.gameObject.SetActive(false);
+        State = BoardState.Menu;
     }
 
     private void OnEndTurn()
@@ -179,6 +191,16 @@ public class Board : MonoBehaviour
     {
         switch (State)
         {
+            case BoardState.Intro:
+                {
+                    ButtonIntro.gameObject.SetActive(true);
+                    break;
+                }
+            case BoardState.Menu:
+                {
+                    State = BoardState.Load;
+                    break;
+                }
             case BoardState.ConfirmLoad:
                 {
                     ShowMessageBox("do you want to abort the game\nand load a new board?", "yes", "no", BoardState.Load, BoardState.PlayRound);
