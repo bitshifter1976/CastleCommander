@@ -53,20 +53,20 @@ public class Player : MonoBehaviour
         var unitOnCastleTile = units.Any(u => u.BoardPosition == castle.BoardPosition);
         if (!unitOnCastleTile && (units.Count == 0 || Random.Range(0, 5) == 0))
         {
-            yield return StartCoroutine(SpawnUnit(board, castle, units, enemyCastle, enemyUnits));
+            SpawnUnit(board, castle, units, enemyCastle, enemyUnits);
             GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
         }
 
         // 5. attack enemy castle if possible, then try to attack some other enemy unit
-        yield return StartCoroutine(TryToAttack(board, castle, units, enemyCastle, enemyUnits));
+        TryToAttack(board, castle, units, enemyCastle, enemyUnits);
         GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
 
         // 6. move any unit
-        yield return StartCoroutine(MoveAnyUnit(board, castle, units, enemyCastle, enemyUnits));
+        MoveAnyUnit(board, castle, units, enemyCastle, enemyUnits);
         GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
 
         // 7. attack enemy castle if possible, then try to attack some other enemy unit
-        yield return StartCoroutine(TryToAttack(board, castle, units, enemyCastle, enemyUnits));
+        TryToAttack(board, castle, units, enemyCastle, enemyUnits);
         GetPlayingPieces(out units, out castle, out enemyUnits, out enemyCastle);
 
         // 8. end round if not already happend
