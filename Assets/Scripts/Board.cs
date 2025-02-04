@@ -228,7 +228,7 @@ public class Board : MonoBehaviour
                     ShowMessageBox($"player {ActivePlayer.PlayerId} get ready!", "go", null, BoardState.RollDiceStart);
                     SelectActiveCastle();
                     if (ActivePlayer.IsAi)
-                        ActivePlayer.Think(this);
+                        ActivePlayer.StartRound(this);
                     break;
                 }
             case BoardState.RollDiceStart:
@@ -301,6 +301,8 @@ public class Board : MonoBehaviour
                         {
                             if (!ActivePlayer.IsAi)
                                 ShowPath(MouseHandler.MouseOverLandscapeTilePosition);
+                            else
+                                ActivePlayer.Think(this);
 
                             if (leftSelectedPlayingPiece != null)
                                 UnitTypeInfoBar.Show(leftSelectedPlayingPiece);
@@ -438,7 +440,27 @@ public class Board : MonoBehaviour
         TilemapSelect.SetTile(selectedPlayingField.BoardPosition, selectedCastle);
     }
 
-    public bool ShowPath(Vector3Int toPosition)
+    public bool MovementPossible(Vector3Int toPosition)
+    {
+        if (formerLeftSelectedPlayingPiece != null && formerLeftSelectedPlayingPiece.Player.PlayerId == ActivePlayer.PlayerId)
+        {
+            pathfinder.GenerateAstarPath(formerLeftSelectedPlayingPiece.BoardPosition, toPosition, out var path);
+            var costs = 0f;
+            foreach (var position in path)
+            {
+                var castle = GameTiles.Instance.Get<CastleTile>(position);
+                var tile = GameTiles.Instance.Get<LandscapeTile>(position);
+                costs += CalcualteMovementCosts(tile.MovementCost, formerLeftSelectedPlayingPiece.Info.Speed);
+                if (!tile.Movable || costs > ActivePlayer.PointsLeft || castle != null)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void ShowPath(Vector3Int toPosition)
     {
         var movementPossible = false;
         TilemapPath.ClearAllTiles();
@@ -467,7 +489,6 @@ public class Board : MonoBehaviour
             }
             MovementPath = movementPossible ? path : null;
         }
-        return movementPossible;
     }
 
     private float CalcualteMovementCosts(int costs, int speed)
